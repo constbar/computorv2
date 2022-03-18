@@ -21,14 +21,74 @@ class Cmplx:
         else:
             # print(piece)
             self.re = float(piece)
+            # self.re = i/nt(piece)
         
     def __str__(self):
-        return f'{self.re}+{self.im}i'
+        return_dict = dict()
+        return_dict['real'] = self.re
+        return_dict['imag'] = self.im
+        return Cmplx.make_str_output(return_dict)
+
+        # return ''
+        # return f'{self.re}+{self.im}i'
 
     def __add__(self, other):
-        self.re += other.re
-        self.im += other.im
+        self.re = self.re + other.re
+        self.im = self.im + other.im
         return self
+
+    def __sub__(self, other):
+        self.re = self.re - other.re
+        self.im = self.im - other.im
+        return self
+
+    # make it cleaner
+    def __mul__(self, other):
+        # other conmplex else just mult
+        # here an error when it called 
+        fi1 = Cmplx(f'{self.re * other.re}')
+        fi2 = Cmplx(f'{self.re * other.im}i')
+        sc1 = Cmplx(f'{self.im * other.re}i')
+        # sc2 = f'{self.im * other.im}i^2'
+        sc2 = Cmplx.simplify_expression(f'{self.im * other.im}i^2')
+        sc2 = Cmplx.clean_signs(sc2) # make if more clever
+        sc2 = Cmplx(sc2)
+        fin = fi1 + fi2 + sc1 + sc2
+        # print(fin)
+        # print(fi1)
+        # print(fi2)
+        # print(sc1)
+        # print(sc2)
+        print()
+        # Cmplx.simplify_expression(sc2)
+        return fin
+
+    def __pow__(self, power):
+        # не рабоает со степень больше 2
+        if power.co is True:
+            return 'exponent must be an integer'
+        print(self)
+        print(power)
+        # сделатть перегрузку присваивания
+        tmp = self
+        print()
+        for i in range(int(power.re) - 1):
+            tmp = tmp * tmp
+            # print(tmp)
+        print(tmp)
+        # self =
+        print() 
+        return 'a'
+
+        # check it if it less than 0
+        # print(type(self.re))
+        # print()
+        # self.re = self.re ** power.re
+        # self.im = self.im ** power.re
+        # print(f'{self.re} + {self.im}i^{power.re}')
+        # exit()
+        # return self
+
 
     REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))\*?[iI]\^\d+'
 
@@ -36,7 +96,6 @@ class Cmplx:
     # make it better
     def make_str_output(res_dict: dict) -> str:
         f = ''
-
         if res_dict['real']:
             f += str(res_dict['real'])
         if res_dict['imag']:
@@ -48,8 +107,12 @@ class Cmplx:
     # this only for i's
     # think about dict value = False
     @staticmethod
-    def pow_replacer(part: str, diction=False):
-        part = part.group(0).replace('*', '')
+    def pow_replacer(part: str, diction=False): # или part is class regex <class 're.Match'>
+        if type(part).__name__ == 'Match': # need i?
+            part = part.group(0).replace('*', '')
+        else:
+            part = part.replace('*', '')
+
         clx_dict = dict()
         clx_dict['real'] = 0
         clx_dict['imag'] = 0
@@ -81,14 +144,14 @@ class Cmplx:
         result = re.sub(Cmplx.REG_POW_COMPL, Cmplx.pow_replacer, expression)
         return result
 
-    # def __pow__(self, power):
-    #     if self.re and self.im:
-    #         print(123)
 
 
 
 # kek = Cmplx.simplify_expression('(3i^5+10*i^5) +3*2i-i+i-1*i+20')
+# kek = Cmplx.simplify_expression('i')
+# kek = Cmplx.simplify_expression('20.0i^2')
 # kek = Cmplx.clean_signs(kek)
+# print(kek)
 # print(kek)
 
 # # asn = r'(\d+\.\d+i|\w+|[^ 0-9])'
@@ -103,5 +166,12 @@ class Cmplx:
 # потом делаем эвал
 
 
-q = Cmplx('20i') + Cmplx('30i') + Cmplx('31')
-print(q)
+# q = Cmplx('30i') - (Cmplx('-12i') + Cmplx('12')) # + Cmplx('31')
+# print((Cmplx('5') + Cmplx('2i')) ** Cmplx('3'))
+# print(Cmplx('5') * Cmplx('3i'))
+
+# print((Cmplx('2') + Cmplx('20i')) * (Cmplx('10') - Cmplx('i')))
+# print(Cmplx('5i') * Cmplx('3')) # error
+# print(Cmplx('5i') * Cmplx('3i'))
+print(Cmplx('5i') ** Cmplx('2'))
+# print(Cmplx('5i'))

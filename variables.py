@@ -60,21 +60,3 @@ class Rational(IVariable):
 print(Parser.read_expression('2 - 2'))
 # c = Rational('input line')
 # c.do()
-
-
-# import numpy as np
-
-# class ComplexOrder(Object):
-#     def __lt__(self, other):
-#         return np.absolute(self) < np.absolute(other)
-#     # ... keep want you want (including or not eq and ne)
-#     def __ge__(self, other):
-#         return np.absolute(self) >= np.absolute(other)
-
-# class OrderedComplex(ComplexOrder, complex):
-#     def __init__(self, real, imag = 0):
-#         complex.__init__(self, real, imag)
-
-# class NPOrderedComplex64(ComplexOrder, np.complex64):
-#     def __init__(self, real = 0):
-#         np.complex64.__init__(self, real)

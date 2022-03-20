@@ -6,23 +6,22 @@ from copy import deepcopy
 from termcolor import colored
 
 
-class Cmplx:
+class Complex:
     REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'
-
-    def __init__(self, piece: str):
+    def __init__(self, inp: str):
         self.re = 0
         self.im = 0
         self.co = False
-        if '+' in piece:
-            piece = piece.replace('+', '')
-        if 'i' in piece:  # or big I
+        if '+' in inp:
+            inp = inp.replace('+', '')
+        if 'i' in inp:  # or big I
             self.co = True
-            if piece == '-i' or piece == 'i':
-                self.im = float(piece.replace('i', '1'))
+            if inp == '-i' or inp == 'i':
+                self.im = float(inp.replace('i', '1'))
             else:
-                self.im = float(piece.strip('i'))
+                self.im = float(inp.strip('i'))
         else:
-            self.re = float(piece)
+            self.re = float(inp)
 
     def __str__(self):
         # if result of calculationsw is 0 -> return 0 and co make false
@@ -30,7 +29,7 @@ class Cmplx:
         return_dict = dict()
         return_dict['real'] = self.re
         return_dict['imag'] = self.im
-        return Cmplx.make_str_output(return_dict)
+        return Complex.make_str_output(return_dict)
 
     def __add__(self, other):
         self.re = self.re + other.re
@@ -51,19 +50,20 @@ class Cmplx:
         if self.co is True and other.co is False:  # del not
             self, other = other, self
 
-        fi1 = Cmplx(f'{self.re * other.re}')
-        fi2 = Cmplx(f'{self.re * other.im}i')
-        sc1 = Cmplx(f'{self.im * other.re}i')
+        fi1 = Complex(f'{self.re * other.re}')
+        fi2 = Complex(f'{self.re * other.im}i')
+        sc1 = Complex(f'{self.im * other.re}i')
         if self.co:
-            sc2 = Cmplx.simplify_expression(f'{self.im * other.im}i^2')
-            sc2 = Cmplx.clean_signs(sc2)  # make if more clever
+            sc2 = Complex.simplify_expression(f'{self.im * other.im}i^2')
+            sc2 = Complex.clean_signs(sc2)  # make if more clever
         else:
             sc2 = '0'
         # ValueError
-        sc2 = Cmplx(sc2)
+        sc2 = Complex(sc2)
         fin = fi1 + fi2 + sc1 + sc2
         fin.co = True if fin.im else False
-        # if not fin.im:
+        # matybe make self = deep.copy(fin) -> return self
+        # if not fin.im: esli deep copy ok -> izmenit' yslovie
         #     fin.co = False
         return fin
 
@@ -95,13 +95,13 @@ class Cmplx:
         if power.co is True:
             return 'exponent must be an integer'
         if self.co is False and power.co is False:
-            return Cmplx(str(self.re ** power.re))
+            return Complex(str(self.re ** power.re))
 
         temp = deepcopy(self)
         if not self.re:
             self.im = self.im ** power.re
-            pw = Cmplx.simplify_expression(f'i^{int(power.re)}')
-            return Cmplx(str(self.im)) * Cmplx(Cmplx.clean_signs(pw))
+            pw = Complex.simplify_expression(f'i^{int(power.re)}')
+            return Complex(str(self.im)) * Complex(Complex.clean_signs(pw))
         for i in range(int(power.re) - 1):
             temp = temp * self
         temp.co = True if temp.im else False
@@ -151,7 +151,7 @@ class Cmplx:
             clx_dict['imag'] = 0
 
         # print(clx_dict['real'], clx_dict['imag'], clx_dict['pwr'])
-        return '+' + Cmplx.make_str_output(clx_dict)
+        return '+' + Complex.make_str_output(clx_dict)
 
     @staticmethod
     def clean_signs(raw_str: str) -> str:
@@ -162,31 +162,32 @@ class Cmplx:
 
     @staticmethod
     def simplify_expression(expression: str) -> str:
-        result = re.sub(Cmplx.REG_POW_COMPL, Cmplx.pow_replacer, expression)
+        result = re.sub(Complex.REG_POW_COMPL, Complex.pow_replacer, expression)
         return result
 
 
-# test = (Cmplx('-30') / Cmplx('0i'))
-# test = (Cmplx('5i') * Cmplx('6i')) / (Cmplx('2i') - Cmplx('2i'))
-# test = ((Cmplx('5i') * Cmplx('6i')) / Cmplx('0'))
-# test = (Cmplx('5i') * Cmplx('6i')) / (Cmplx('2i') - Cmplx('2i'))  -eror here
+# test = (Complex('-30') / Complex('0i'))
+# test = (Complex('5i') * Complex('6i')) / (Complex('2i') - Complex('2i'))
+# test = ((Complex('5i') * Complex('6i')) / Complex('0'))
+# test = (Complex('5i') * Complex('6i')) / (Complex('2i') - Complex('2i'))  -eror here
 
-# test = Cmplx('5i') * Cmplx('2i') / Cmplx('2i')
-# test = (Cmplx('5i') / Cmplx('22i')) / ((Cmplx('5') - Cmplx('2i')))
-# test = (Cmplx('52i') * Cmplx('52i')  / Cmplx('i')) - Cmplx('13')
-# test = (Cmplx('5') / Cmplx('2i'))
+# test = Complex('5i') * Complex('2i') / Complex('2i')
+# test = (Complex('5i') / Complex('22i')) / ((Complex('5') - Complex('2i')))
+# test = (Complex('52i') * Complex('52i')  / Complex('i')) - Complex('13')
+# test = (Complex('5') / Complex('2i'))
 # print(test.co)
 # print(5/22)
 
-test = Cmplx('1') - Cmplx('2i') * Cmplx('2i') + Cmplx('2i') / Cmplx('2i') ** Cmplx('2')
-# test = test * Cmplx('i')
+# test = Complex('1') - Complex('2i') * Complex('2i') + Complex('2i') / Complex('2i') ** Complex('2')
+test = Complex('-4i') - Complex('4')
+# test = test * Complex('i')
 print(test)
 print(test.co)
 
 
 
 # try: # need to handle it
-#     # test = Cmplx('5i') ** Cmplx('2i')  * Cmplx('2i')
+#     # test = Complex('5i') ** Complex('2i')  * Complex('2i')
 #     print(test)
 # except TypeError:
 #     print(123)

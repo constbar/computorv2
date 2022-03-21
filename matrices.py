@@ -4,7 +4,16 @@
 # separate the columns of a matrix, which on the other hand will not be present in the
 # assignment of a matrix that has only one column.
 
+# write smth in return value when errors occures
 # make anotations
+# test moew cases with __rmul__
+# если осталась только одна row -> make sum??
+# rename clean
+# try .2            1.   0.0     numbers, regex will catch them
+
+
+# тест неравных матриц
+
 import sys
 from copy import deepcopy
 
@@ -14,10 +23,6 @@ class Matrix:
         self.raw_inp = inp[1:-1].split(';')
         self.clean_m = self.cleaned_input
 
-        # print(inp)
-        # print(self.clean_m)
-        # sys.exit()
-        
         # # call exception if check_uniformity == 0
         # if not self.check_uniformity():
         #     return 'nan' -> call str ???
@@ -78,7 +83,9 @@ class Matrix:
         return rotated
 
     def __mul__(self, other):
-        if self.cols != other.rows:
+        if isinstance(other, int) or isinstance(other, float):
+            return self.__rmul__(other)
+        elif self.cols != other.rows:
             print('cant make mult')
             return
 
@@ -90,12 +97,38 @@ class Matrix:
                 res_cell = list(zip(self.clean_m[self_row], rotated_other[rot_row]))
                 res_cell = [eval(str(i).strip('()').replace(',', '*')) for i in res_cell]
                 ret_matrix[self_row][rot_row] = sum(res_cell)
-
-        # если осталась только одна row -> make sum
         self.__init__(str(ret_matrix).replace(' ', '').replace('],[', '];['))
         return self
 
+    def __rmul__(self, other):
+        if isinstance(other, int) or isinstance(other, float):
+            for row in range(self.rows):
+                for col in range(self.cols):
+                    self.clean_m[row][col] *= other
+        return self
+        # else:
+        #     print('is it works???')
+        #     return self.__mul__(other) # ??
 
+
+    def __pow__(self, power):
+        # pow -1 -> invewse matrix
+            # dolzhna bit' pravil'naya matrica
+            # 
+        # pow shold be more 0
+        # if power not int -> na vihod
+        if self.rows != self.cols:
+            print('matrix should be square')
+            return # think about return vals
+        
+        temp = deepcopy(self)
+        for i in range(power - 1):
+            temp = temp * self
+        return temp
+
+    def __rpow__(self, power):
+        return 'imposible' # make good describe
+        return
 
 
     def __str__(self):
@@ -114,20 +147,32 @@ class Matrix:
         #     print( mat[i][j] , end = ' ')
         #   print()
 
-# сделать умножение на число
-# сделать возведение в степень
-# разрбраться с модулем %
-# сдеалть проверку в вычислении -> проверку на матрицу
+# разрбраться с модулем % - определитель?
+# деление матриц?
 # подумать о значках больше / меньше в компексах
-
+# прочитаь сабж на предмет -[[]]
+###             (?:(\[(?:(?:\[?\d+\.\d*,?\]?;?)|(?:\[?\d+,?\]?;?),?){1,}\])|\d*\.\d*|\d+) - fin
 
 # m2 = Matrix('[[4,3,3];[3,3,5]]')
 
 m3 = Matrix('[[4.5,3];[-4.3,2];[2,2]]') # 3x2
-print(m3)
-m1 = Matrix('[[1];[2]]') # 2x1
-print(m1)
-print(m3 * m1)
+# print(m3)
+m1 = Matrix('[[1];[2];[3]]') # 2x1
+m4 = Matrix('[[3,4,2]]') # 2x1
+# print(m1)
+# print(m3 * m1)
+# print(m4 * m1)
+# print(m3)
+# print(m3 * 10)
+# print(10 * m3)
+# print(m1 * 5)
+m5 = Matrix('[[1,2,3];[6,-5,7];[2,3,4]]')
+# print(m5 ** 3)
+print(3 ** m5)
+
+
+# сделать prohibited signs like int - Matix, > < == ^ 
+# если что-то осталось после вывод всех данных -> return invalid syntax
 
 
 # m1 = Matrix('[[1.1,2,3];[3,4,5]]')
@@ -176,3 +221,20 @@ print(m3 * m1)
 
 
 # \[\]{1,};
+
+
+w
+# -?\[(?:(?:\d+\.?\d+?)) - dont know what is it
+
+#     # REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'
+
+# -?\[(?:(?:\d+\.?\d+?)) - beggining
+# -?\[(?:(?:\[\d+\.?\d?\,\d+\.?\d?\]))\] - for 1 repeat
+
+# \[(?:(?:\d+\.\d+\,?)|(?:\d+\,?)){1,}\] fin
+# \[(?:(?:\d+\.\d+\,?)|(?:\d+\,?)){1,}\]\;? good
+# \[\[(?:(?:\d+\.\d+)|(?:\d+)\,?){1,}\];?\] not that good
+# \[(?:(?:(?:\d+\.\d*)|(?:\d+),?){1,})\];?
+# (?:(?:(?:\[?\d+\.\d*\]?;?,?)|(?:\[?\d+\]?;?,?),?){1,}) so so
+# \[(?:(?:\[?\d+\.\d*\]?;?,?)|(?:\[?\d+\]?;?,?),?){1,}\] - ok
+# \[(?:(?:\[?\d+\.\d*,?]?;?)|(?:\[?\d+,?]?;?),?){1,}\] - very ok without /

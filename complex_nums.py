@@ -5,6 +5,7 @@ import sys
 from copy import deepcopy
 from termcolor import colored
 
+# try isinstance not type is 
 
 class Complex:
     REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'

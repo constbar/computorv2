@@ -147,15 +147,73 @@ class Matrix:
         #     print( mat[i][j] , end = ' ')
         #   print()
 
+    @staticmethod
+    def opredelitel_2(m):
+        return m[0][0] * m[1][1] - m[0][1] * m[1][0]
+
+    # % make class input
+    @staticmethod
+    def opredelitel(m):
+        # should be square matrix
+        # n = # make another way n
+        op = None # where to put it
+        n = len(m)
+        if n == 2:
+            return Matrix.opredelitel_2(m)
+
+        for i in m[1:]:
+            print(i)
+        print()
+
+        full = list()
+
+
+
+        for x in range(n):
+            temp = deepcopy(m[1:]) # 2
+            for y in range(n - 1):
+                # pppp = deepcopy(list())
+                # print(temp[y][x], 'ind ', x, y)
+                # temp[y][x] = []
+                del temp[y][x]
+            full.append(temp)
+        
+
+
+        сделать таблицу знаков
+        сделать умножения на зипом фин результата
+        рекурсия для подсчета
+
+
+        for i in range(len(full)):
+            full[i] = Matrix.opredelitel_2(full[i])
+            print(full[i])
+
+
+        # print(m)
+
+        return op
+
+
+
 # разрбраться с модулем % - определитель?
 # деление матриц?
 # подумать о значках больше / меньше в компексах
 # прочитаь сабж на предмет -[[]]
 ###             (?:(\[(?:(?:\[?\d+\.\d*,?\]?;?)|(?:\[?\d+,?\]?;?),?){1,}\])|\d*\.\d*|\d+) - fin
 
+
+dlya_opred = [[1,2,3], [4,5,6], [7,8,9]]
+# del dlya_opred[0][0]
+# print(dlya_opred)
+print(Matrix.opredelitel(dlya_opred))
+# m3 = Matrix('[[4.5,3];[-4.3,2];[2,2]]') # 3x2
+# print(m3.clean_m)
+
+sys.exit()
+
 # m2 = Matrix('[[4,3,3];[3,3,5]]')
 
-m3 = Matrix('[[4.5,3];[-4.3,2];[2,2]]') # 3x2
 # print(m3)
 m1 = Matrix('[[1];[2];[3]]') # 2x1
 m4 = Matrix('[[3,4,2]]') # 2x1
@@ -168,7 +226,7 @@ m4 = Matrix('[[3,4,2]]') # 2x1
 # print(m1 * 5)
 m5 = Matrix('[[1,2,3];[6,-5,7];[2,3,4]]')
 # print(m5 ** 3)
-print(3 ** m5)
+# print(3 ** m5) # !!!! end it here
 
 
 # сделать prohibited signs like int - Matix, > < == ^ 

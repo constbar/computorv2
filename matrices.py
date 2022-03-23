@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # The matrix syntax is of the form [[A0,0 , A0,1 , ...]; [A1,0 , A1,1 , ...]; ...]
 # The semicolon is used to separate the rows of a matrix, so it is not present in the as-
 # signment of a matrix that has only one row. On the other hand, the comma is used to
@@ -147,54 +149,19 @@ class Matrix:
         #     print( mat[i][j] , end = ' ')
         #   print()
 
-    @staticmethod
-    def opredelitel_2(m):
-        return m[0][0] * m[1][1] - m[0][1] * m[1][0]
-
-    # % make class input
-    @staticmethod
-    def opredelitel(m):
-        # should be square matrix
-        # n = # make another way n
-        op = None # where to put it
-        n = len(m)
-        if n == 2:
-            return Matrix.opredelitel_2(m)
-
-        for i in m[1:]:
-            print(i)
-        print()
-
-        full = list()
 
 
+   
 
-        for x in range(n):
-            temp = deepcopy(m[1:]) # 2
-            for y in range(n - 1):
-                # pppp = deepcopy(list())
-                # print(temp[y][x], 'ind ', x, y)
-                # temp[y][x] = []
-                del temp[y][x]
-            full.append(temp)
-        
+    
+   
 
+# проверка на пустую матрицу. может ли она существовать??
+# если да, то сделать проверки в функициях, где это приемлимо
 
-        сделать таблицу знаков
-        сделать умножения на зипом фин результата
-        рекурсия для подсчета
-
-
-        for i in range(len(full)):
-            full[i] = Matrix.opredelitel_2(full[i])
-            print(full[i])
-
-
-        # print(m)
-
-        return op
-
-
+# сделать таблицу знаков
+# сделать умножения на зипом фин результата
+# рекурсия для подсчета
 
 # разрбраться с модулем % - определитель?
 # деление матриц?
@@ -202,11 +169,54 @@ class Matrix:
 # прочитаь сабж на предмет -[[]]
 ###             (?:(\[(?:(?:\[?\d+\.\d*,?\]?;?)|(?:\[?\d+,?\]?;?),?){1,}\])|\d*\.\d*|\d+) - fin
 
+    # @staticmethod
+    # def getMatrixMinor(m,i,j):
+    #     return [row[:j] + row[j+1:] for row in (m[:i]+m[i+1:])]
 
-dlya_opred = [[1,2,3], [4,5,6], [7,8,9]]
+    @staticmethod
+    def get_determinant(input_matrix):
+        if input_matrix.rows != input_matrix.cols:
+            print('square!')
+            return # need test
+            # what if r and c == 0 ??
+        elif input_matrix.rows == 1:
+            return input_matrix.clean_m[0][0]
+        elif input_matrix.rows == 2:
+            return input_matrix.clean_m[0][0] * input_matrix.clean_m[1][1] \
+                - input_matrix.clean_m[0][1] * input_matrix.clean_m[1][0]
+        determinant = 0
+        
+        def getMatrixMinor(m, i, j): # rename it
+            return [row[:j] + row[j + 1:] for row in (m[:i] + m[i + 1:])]
+        
+        # for col in range(input_matrix.cols):
+        #     sign_map = -1
+        #     if col % 2 == 0:
+        #         sign_map = 1
+        #     minor_det = Matrix.get_determinant(getMatrixMinor(input_matrix.clean_m, 0, col))
+        #     determinant = determinant * sign_map * input_matrix.clean_m[0][col]
+
+
+        #     determinant += ((-1)**col) * m[0][col] * Matrix.get_determinant(Matrix.getMatrixMinor(m, 0, col))
+            # determinant = determinant + 
+        return determinant
+
+# print(Matrix.get_determinant([[3,22,1],[1,2,3],[6,7,8]]))
+
+
+# dlya_opred = [[1,22,4], [23,3,6], [7,2,9]]
+# dlya_opred = [[1,2,3,4], [5,6,7,8], [9,1,2,3], [4,5,6,7]]
+# dlya_opred = [[1,2,3,4], [5,6,7,8], [9,1,2,3], [4,5,6,7]]
 # del dlya_opred[0][0]
 # print(dlya_opred)
-print(Matrix.opredelitel(dlya_opred))
+
+
+print(Matrix.get_determinant(Matrix('[[1,2,3,4];[5,6,7,8];[9,1,2,3];[4,5,6,7]]')))
+# print(Matrix.get_determinant(Matrix('[[2]]')))
+# print(Matrix.get_determinant(Matrix('[[2]]')))
+# print(Matrix.get_determinant(Matrix('[[2,5];[2,3]]')))
+# print(Matrix.opredelitel(dlya_opred))
+# print(Matrix.determinant(dlya_opred))
 # m3 = Matrix('[[4.5,3];[-4.3,2];[2,2]]') # 3x2
 # print(m3.clean_m)
 
@@ -296,3 +306,6 @@ w
 # (?:(?:(?:\[?\d+\.\d*\]?;?,?)|(?:\[?\d+\]?;?,?),?){1,}) so so
 # \[(?:(?:\[?\d+\.\d*\]?;?,?)|(?:\[?\d+\]?;?,?),?){1,}\] - ok
 # \[(?:(?:\[?\d+\.\d*,?]?;?)|(?:\[?\d+,?]?;?),?){1,}\] - very ok without /
+
+
+

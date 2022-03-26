@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 
-# The matrix syntax is of the form [[A0,0 , A0,1 , ...]; [A1,0 , A1,1 , ...]; ...]
-# The semicolon is used to separate the rows of a matrix, so it is not present in the as-
-# signment of a matrix that has only one row. On the other hand, the comma is used to
-# separate the columns of a matrix, which on the other hand will not be present in the
-# assignment of a matrix that has only one column.
+# % - eto opredelitel'
+# сделать prohibited signs like int - Matix, > < == ^
+# если что-то осталось после вывод всех данных -> return invalid syntax
+# проверка на пустую матрицу. может ли она существовать?? если да, то сделать проверки в функициях, где это приемлимо
+
+# сделать отдельный блок с разделом тестов из сабжа
 
 # write smth in return value when errors occures
 # make anotations
@@ -13,14 +14,24 @@
 # rename clean
 # try .2            1.   0.0     numbers, regex will catch them
 
+# rename all row to r and col to c in loops ili ne nado???
 
 # тест неравных матриц
+# where m -> make matrix in input to funcs
 
+# Программа также должна управлять модулями с помощью оператора %, 
+# а также умножением матриц, которое будет отмечено ∗∗. 
+# Почленное умножение двух матриц или скаляра на матрицу отмечается знаком *. поэлементное умножение
+
+import re
 import sys
+
 from copy import deepcopy
 
 
 class Matrix:
+    REG = r'\[(?:\[(?:\d+,?)+\];?)+\]'
+
     def __init__(self, inp: str):
         self.raw_inp = inp[1:-1].split(';')
         self.clean_m = self.cleaned_input
@@ -31,6 +42,8 @@ class Matrix:
 
         self.rows = len(self.clean_m)
         self.cols = len(self.clean_m[0])
+
+        # проверка !!   check seze equality!! включить
 
         # print(self.clean_m)
         # print(self.rows)
@@ -59,10 +72,11 @@ class Matrix:
 
     def __add__(self, other):
         if not self.check_size_equality(other):
-            print(123123)
-            return '1234'
+            # print(123123)
+            return 'ALARAM in add'
         for row in range(self.rows):
-            self.clean_m[row] = list(zip(self.clean_m[row], other.clean_m[row]))
+            self.clean_m[row] = list(
+                zip(self.clean_m[row], other.clean_m[row]))
             self.clean_m[row] = list(map(sum, self.clean_m[row]))
         return self
 
@@ -72,13 +86,14 @@ class Matrix:
             return '1234'
         for row in range(self.rows):
             other.clean_m[row] = [i * -1 for i in other.clean_m[row]]
-            self.clean_m[row] = list(zip(self.clean_m[row], other.clean_m[row]))
+            self.clean_m[row] = list(
+                zip(self.clean_m[row], other.clean_m[row]))
             self.clean_m[row] = list(map(sum, self.clean_m[row]))
         return self
 
     @staticmethod
     def rotate_matrix(inp_matrix, old_num_rows, old_num_cols):
-        rotated = Matrix.make_empty_matrix(old_num_cols, old_num_rows) 
+        rotated = Matrix.make_empty_matrix(old_num_cols, old_num_rows)
         for col in range(old_num_cols):
             for row in range(old_num_rows):
                 rotated[col][row] = inp_matrix.clean_m[row][col]
@@ -96,10 +111,19 @@ class Matrix:
 
         for self_row in range(len(self.clean_m)):
             for rot_row in range(len(rotated_other)):
-                res_cell = list(zip(self.clean_m[self_row], rotated_other[rot_row]))
-                res_cell = [eval(str(i).strip('()').replace(',', '*')) for i in res_cell]
+                res_cell = list(
+                    zip(self.clean_m[self_row], rotated_other[rot_row]))
+                res_cell = [eval(str(i).strip('()').replace(',', '*'))
+                            for i in res_cell]
                 ret_matrix[self_row][rot_row] = sum(res_cell)
         self.__init__(str(ret_matrix).replace(' ', '').replace('],[', '];['))
+        # возможно просто self matrix присвоить значение в clean-M?
+
+        # if self.inv or other.inv
+        # for r in range(len(self.clean_m)):
+        #     for c in range(len(self.clean_m[0])):
+        #         self.clean_m[r][c] = round(self.clean_m[r][c])
+
         return self
 
     def __rmul__(self, other):
@@ -112,26 +136,29 @@ class Matrix:
         #     print('is it works???')
         #     return self.__mul__(other) # ??
 
+    def __truediv__(self, other):
+        return self * other**(-1)
 
     def __pow__(self, power):
-        # pow -1 -> invewse matrix
-            # dolzhna bit' pravil'naya matrica
-            # 
+        # dolzhna bit' pravil'naya matrica
+        #
         # pow shold be more 0
-        # if power not int -> na vihod
+        # if power not int -> na vihod means float
         if self.rows != self.cols:
             print('matrix should be square')
-            return # think about return vals
-        
+            return  # think about return vals
+        elif power == -1: # check it
+            return Matrix.inverse_matrix(self)
+        # elif
+
         temp = deepcopy(self)
         for i in range(power - 1):
             temp = temp * self
         return temp
 
     def __rpow__(self, power):
-        return 'imposible' # make good describe
+        return 'imposible'  # make good describe
         return
-
 
     def __str__(self):
         # add try int
@@ -149,163 +176,107 @@ class Matrix:
         #     print( mat[i][j] , end = ' ')
         #   print()
 
-
-
-   
-
-    
-   
-
-# проверка на пустую матрицу. может ли она существовать??
-# если да, то сделать проверки в функициях, где это приемлимо
-
-# сделать таблицу знаков
-# сделать умножения на зипом фин результата
-# рекурсия для подсчета
-
-# разрбраться с модулем % - определитель?
-# деление матриц?
-# подумать о значках больше / меньше в компексах
-# прочитаь сабж на предмет -[[]]
-###             (?:(\[(?:(?:\[?\d+\.\d*,?\]?;?)|(?:\[?\d+,?\]?;?),?){1,}\])|\d*\.\d*|\d+) - fin
-
-    # @staticmethod
-    # def getMatrixMinor(m,i,j):
-    #     return [row[:j] + row[j+1:] for row in (m[:i]+m[i+1:])]
+    @staticmethod
+    def get_minor(m, i, j):
+        return [row[:j] + row[j + 1:] for row in (m[:i] + m[i + 1:])]
 
     @staticmethod
-    def get_determinant(input_matrix):
-        if input_matrix.rows != input_matrix.cols:
-            print('square!')
-            return # need test
+    def get_determinant(m_list):
+        rows_len = len(m_list)
+        cols_len = len(m_list[0])
+        if rows_len != cols_len:
+            print('matrix should be square!')
+            return  # need test
             # what if r and c == 0 ??
-        elif input_matrix.rows == 1:
-            return input_matrix.clean_m[0][0]
-        elif input_matrix.rows == 2:
-            return input_matrix.clean_m[0][0] * input_matrix.clean_m[1][1] \
-                - input_matrix.clean_m[0][1] * input_matrix.clean_m[1][0]
-        determinant = 0
-        
-        def getMatrixMinor(m, i, j): # rename it
-            return [row[:j] + row[j + 1:] for row in (m[:i] + m[i + 1:])]
-        
-        # for col in range(input_matrix.cols):
-        #     sign_map = -1
-        #     if col % 2 == 0:
-        #         sign_map = 1
-        #     minor_det = Matrix.get_determinant(getMatrixMinor(input_matrix.clean_m, 0, col))
-        #     determinant = determinant * sign_map * input_matrix.clean_m[0][col]
-
-
-        #     determinant += ((-1)**col) * m[0][col] * Matrix.get_determinant(Matrix.getMatrixMinor(m, 0, col))
-            # determinant = determinant + 
+        elif rows_len == 1:
+            return m_list[0][0]
+        elif rows_len == 2:
+            return m_list[0][0] * m_list[1][1] \
+                - m_list[0][1] * m_list[1][0]
+        else:
+            determinant = 0
+            for col in range(cols_len):
+                minor_det = Matrix.get_determinant(
+                    Matrix.get_minor(m_list, 0, col))
+                determinant += (-1)**col * m_list[0][col] * minor_det
         return determinant
 
-# print(Matrix.get_determinant([[3,22,1],[1,2,3],[6,7,8]]))
+    @staticmethod
+    def inverse_matrix(m_class): # make matrix class
+        # узнать условие инвертирования матриц
+        determinant = Matrix.get_determinant(m_class.clean_m)
+        # if determinant == 0 -> bad -> return
+        #  if равен 0, запишите «однозначного решения нет». 
+        # if == 1 
+        # сделать функцию для возврата как в 102 строке
+        if m_class.rows == 2:
+            m_class.clean_m = [[m_class.clean_m[1][1] / determinant,
+                                -1 * m_class.clean_m[0][1] / determinant],
+                               [-1 * m_class.clean_m[1][0] / determinant,
+                                m_class.clean_m[0][0] / determinant]]
+            # return [[m_class.clean_m[1][1] / determinant,
+            #     -1 * m_class.clean_m[0][1] / determinant],
+            #     [-1 * m_class.clean_m[1][0] / determinant,
+            #     m_class.clean_m[0][0] / determinant]] # return class here need round here??
+        else:
+            cofactors = []
+            for row in range(m_class.rows):
+                cofactor_row = []
+                for col in range(m_class.cols):
+                    minor = Matrix.get_minor(m_class.clean_m, row, col)
+                    cofactor_row.append(((-1)**(row + col))
+                                        * Matrix.get_determinant(minor))
+                cofactors.append(cofactor_row)
+            cofactors = list(map(list, zip(*cofactors)))
+            for row in range(len(cofactors)):
+                for col in range(len(cofactors)):
+                    cofactors[row][col] = cofactors[row][col] / determinant
+            m_class.clean_m = cofactors
+
+        for r in range(len(m_class.clean_m)):
+            for c in range(len(m_class.clean_m[0])):
+                m_class.clean_m[r][c] = round(m_class.clean_m[r][c], 4)
+        
+        # add here property in class inverse
+        return m_class
+
+    @staticmethod # maybe it can be common func in utils
+    def check_available_signs(expression: str):
+        expression = expression.replace('^', '**')
+        # +-/*% - availible signs
+        try:
+            temp = re.sub(Matrix.REG, '1', expression)
+            eval(temp)
+        except SyntaxError:
+            print('invalid syntax with 1')
+            return 'ALARM at check'
+        return expression
 
 
-# dlya_opred = [[1,22,4], [23,3,6], [7,2,9]]
-# dlya_opred = [[1,2,3,4], [5,6,7,8], [9,1,2,3], [4,5,6,7]]
-# dlya_opred = [[1,2,3,4], [5,6,7,8], [9,1,2,3], [4,5,6,7]]
-# del dlya_opred[0][0]
-# print(dlya_opred)
+    @staticmethod
+    def add_classes(expression: str) -> str:
+        # use sub for cheeck with ones
+        matches = list(set(re.findall(Matrix.REG, expression)))
+        for m in range(len(matches)):
+            expression = expression.replace(matches[m], f"Matrix('{matches[m]}')")
+        return expression
+
+    def __mod__(self, other):
+        pass        
 
 
-print(Matrix.get_determinant(Matrix('[[1,2,3,4];[5,6,7,8];[9,1,2,3];[4,5,6,7]]')))
-# print(Matrix.get_determinant(Matrix('[[2]]')))
-# print(Matrix.get_determinant(Matrix('[[2]]')))
-# print(Matrix.get_determinant(Matrix('[[2,5];[2,3]]')))
-# print(Matrix.opredelitel(dlya_opred))
-# print(Matrix.determinant(dlya_opred))
-# m3 = Matrix('[[4.5,3];[-4.3,2];[2,2]]') # 3x2
-# print(m3.clean_m)
-
-sys.exit()
-
-# m2 = Matrix('[[4,3,3];[3,3,5]]')
-
-# print(m3)
-m1 = Matrix('[[1];[2];[3]]') # 2x1
-m4 = Matrix('[[3,4,2]]') # 2x1
-# print(m1)
-# print(m3 * m1)
-# print(m4 * m1)
-# print(m3)
-# print(m3 * 10)
-# print(10 * m3)
-# print(m1 * 5)
-m5 = Matrix('[[1,2,3];[6,-5,7];[2,3,4]]')
-# print(m5 ** 3)
-# print(3 ** m5) # !!!! end it here
-
-
-# сделать prohibited signs like int - Matix, > < == ^ 
-# если что-то осталось после вывод всех данных -> return invalid syntax
-
-
-# m1 = Matrix('[[1.1,2,3];[3,4,5]]')
-# print(m1)
-# m3 = Matrix('[[4,3];[3,3];[2,2]]')
-# print(m3)
-# print()
-# print(m1 * m3)
-
-# m3 = Matrix('[[4,3];[3,3]]')
-# print()
-# print(m1 - m2)
-# print(m1 + m3)
-# print(m2)
-# print(m3)
-# print()
-# print(82/5)
-
-
-# regex s
-# # [[1,2];[3,2];[3,4]]
-# # [[1,2]]
-
-
-# [[1,2.123];[3,2];[3,4];[123,412,231.2];[2,2,2.2,2,2,123.2]]
-# [[1,2.123,123,412,513.123,88.2];[3,2];[3,4]]
-# [[];[];[];[]]
-# [[]]
-# [[1.2,2]]
-# -[[1,2]]
-# [5, [1.3,2.2]]
-# [5.5, [1.3,2.2]]
-
-
-#     # REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'
-
-# \[[\d+\.?\d+,]+[\d+\.?\d+]*\]
-# -?\[(?:(?:\d+\.?\d+?)) - beggining
-# -?\[(?:(?:\[\d+\.?\d?\,\d+\.?\d?\]))\] - for 1 repeat
-
-
-# (?:(?:\d+\.\d+)|(?:\d+))  - all matches inside []
-# (?:(?:\d+\.\d+\,?)|(?:\d+\,?)){1,} <- one piece inside []
-
-# (?:(?:\d+\.\d+\,?)|(?:\d+\,?)){1,} <- final good
-
-
-# \[\]{1,};
-
-
-w
-# -?\[(?:(?:\d+\.?\d+?)) - dont know what is it
-
-#     # REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'
-
-# -?\[(?:(?:\d+\.?\d+?)) - beggining
-# -?\[(?:(?:\[\d+\.?\d?\,\d+\.?\d?\]))\] - for 1 repeat
-
-# \[(?:(?:\d+\.\d+\,?)|(?:\d+\,?)){1,}\] fin
-# \[(?:(?:\d+\.\d+\,?)|(?:\d+\,?)){1,}\]\;? good
-# \[\[(?:(?:\d+\.\d+)|(?:\d+)\,?){1,}\];?\] not that good
-# \[(?:(?:(?:\d+\.\d*)|(?:\d+),?){1,})\];?
-# (?:(?:(?:\[?\d+\.\d*\]?;?,?)|(?:\[?\d+\]?;?,?),?){1,}) so so
-# \[(?:(?:\[?\d+\.\d*\]?;?,?)|(?:\[?\d+\]?;?,?),?){1,}\] - ok
-# \[(?:(?:\[?\d+\.\d*,?]?;?)|(?:\[?\d+,?]?;?),?){1,}\] - very ok without /
+# matix with power 0 what gives?
+expression = '[[1,2,3];[32,1,2];[4,5,6]]'
 
 
 
+expression = Matrix.check_available_signs(expression)
+print('original expression', expression)
+expression = Matrix.add_classes(expression)
+print(eval(expression))
+
+
+
+
+# with pow
+expression = '[[1,2,3];[32,1,2];[4,5,6]]^2+[[1,2,3];[32,1,2];[4,5,6]]'

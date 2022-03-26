@@ -5,9 +5,12 @@ import sys
 from copy import deepcopy
 from termcolor import colored
 
-# try isinstance not type is 
+# try isinstance not type is
+# сделать модуль комплексного числа !!!
+# make common round for all types
 
 class Complex:
+    # need i -+ before reg ex
     REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'
     def __init__(self, inp: str):
         self.re = 0
@@ -163,9 +166,18 @@ class Complex:
 
     @staticmethod
     def simplify_expression(expression: str) -> str:
+        # для проверки валидности сделать еденичны и эвал чтобы понять ок . не ок,
         result = re.sub(Complex.REG_POW_COMPL, Complex.pow_replacer, expression)
         return result
 
+
+# kek = Complex.simplify_expression('3i^2 - 123 + 122i')
+# kek = Complex.clean_signs(kek)
+# # 1 этап заменяем все степени
+# # 2 чистим знаки, можно чистить знаки прямо в функции pow replacer
+# # сделать рег экс который забирает все переменные и делаем из них классы комплекс чисел parse expression func
+# # вычисление
+# print(kek)
 
 # test = (Complex('-30') / Complex('0i'))
 # test = (Complex('5i') * Complex('6i')) / (Complex('2i') - Complex('2i'))
@@ -180,10 +192,10 @@ class Complex:
 # print(5/22)
 
 # test = Complex('1') - Complex('2i') * Complex('2i') + Complex('2i') / Complex('2i') ** Complex('2')
-test = Complex('-4i') - Complex('4')
-# test = test * Complex('i')
-print(test)
-print(test.co)
+# test = Complex('-4i') - Complex('4')
+# # test = test * Complex('i')
+# print(test)
+# print(test.co)
 
 
 

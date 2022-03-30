@@ -1,27 +1,3 @@
-# перед этим сделать парсинг по регексу по тому что к какому типу относится 
-
-# сделать основной класс, от которого будут наследоваться
-	# str - > raw string
-	# обработка 
-	# выдать результат
-	# сделать перегрузки сложения и удаления
-	# стр или репр сделать для рампечатки результата
-
-
-# класс матрица(интерфейс от которого наследуются)
-# класс вектор -"-
-# класс полином 
-# при инициализции класса давать порядковый номер по индексу
-
-# типа которые надо сделать:
-	# Rational numbers		Natural integers
-	# Complex numbers (with rational coefﬁcients)
-	# Matrices
-	# polynomal
-
-	# Polynomial equations of degree less than or equal to 2
-
-
 # class VariableFactory:
 #   @staticmethod
 #   def build person:

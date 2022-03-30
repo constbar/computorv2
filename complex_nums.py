@@ -5,10 +5,6 @@ import sys
 from copy import deepcopy
 from termcolor import colored
 
-# try isinstance not type is
-# сделать модуль комплексного числа !!!
-# make common round for all types
-
 class Complex:
     # need i -+ before reg ex
     REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'
@@ -170,7 +166,6 @@ class Complex:
         result = re.sub(Complex.REG_POW_COMPL, Complex.pow_replacer, expression)
         return result
 
-
 # kek = Complex.simplify_expression('3i^2 - 123 + 122i')
 # kek = Complex.clean_signs(kek)
 # # 1 этап заменяем все степени
@@ -179,7 +174,8 @@ class Complex:
 # # вычисление
 # print(kek)
 
-# test = (Complex('-30') / Complex('0i'))
+# test = (Complex('-30') / Complex('i')) / (Complex('222') + Complex('1') * Complex('i'))
+# print(test)
 # test = (Complex('5i') * Complex('6i')) / (Complex('2i') - Complex('2i'))
 # test = ((Complex('5i') * Complex('6i')) / Complex('0'))
 # test = (Complex('5i') * Complex('6i')) / (Complex('2i') - Complex('2i'))  -eror here

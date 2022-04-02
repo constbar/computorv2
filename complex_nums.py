@@ -5,6 +5,9 @@ import sys
 from copy import deepcopy
 from termcolor import colored
 
+
+# make norm rouund in str
+
 class Complex:
     # need i -+ before reg ex
     REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'
@@ -50,7 +53,7 @@ class Complex:
         if self.co is True and other.co is False:  # del not
             self, other = other, self
 
-        fi1 = Complex(f'{self.re * other.re}')
+        fi1 = Complex(f'{self.re * other.re}') # means first and second -> rename it
         fi2 = Complex(f'{self.re * other.im}i')
         sc1 = Complex(f'{self.im * other.re}i')
         if self.co:
@@ -68,8 +71,8 @@ class Complex:
         return fin
 
     def __truediv__(self, other):
-        if self.co is True and not self.re and \
-                other.co is True and not other.re:
+        if self.co is True and not self.re \
+            and other.co is True and not other.re:
             self.re = self.im / other.im
             self.im = 0
             self.co = False
@@ -158,17 +161,22 @@ class Complex:
         raw_str = raw_str.replace('-+', '-')
         raw_str = raw_str.replace('++', '+')
         raw_str = raw_str.replace('+-', '-')
+        raw_str = raw_str.replace('/+', '/') # is it neccesary?
+        raw_str = raw_str.replace(')C', ')+C')
+        raw_str = raw_str.replace('/(+C', '/(C')
         return raw_str
 
     @staticmethod
     def simplify_expression(expression: str) -> str:
         # для проверки валидности сделать еденичны и эвал чтобы понять ок . не ок,
         result = re.sub(Complex.REG_POW_COMPL, Complex.pow_replacer, expression)
+        # print('result', result)
         return result
 
 # kek = Complex.simplify_expression('3i^2 - 123 + 122i')
+# print(kek)
 # kek = Complex.clean_signs(kek)
-# # 1 этап заменяем все степени
+# 1 этап заменяем все степени
 # # 2 чистим знаки, можно чистить знаки прямо в функции pow replacer
 # # сделать рег экс который забирает все переменные и делаем из них классы комплекс чисел parse expression func
 # # вычисление

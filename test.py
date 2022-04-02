@@ -33,7 +33,7 @@ class Comp(Cmd):
     def default(self, line):
         # print("Default: {}".format(line))
         try:
-        	Handler.read_expression(line)
+        	Handler.handle_line(line)
         except HandlerException as e:
         	print(colored(e, 'red'))
 

@@ -22,15 +22,15 @@ class Matrix:
         8: 'matrix must be square',
         9: 'power of matrix should be greater than 0',
         10: 'determinant is equal 0. there is no clear solution',
-        11: 'matrix cannot be inverted', #
+        11: 'matrix cannot be inverted', # not used
 
     }
 
-    def __init__(self, inp: str):
-        if inp == '[[]]':
+    def __init__(self, inpt):
+        if inpt == '[[]]':
             raise MatrixException(Matrix.error_dict[1])
 
-        self.raw_inp = inp[1:-1].split(';')
+        self.raw_inp = inpt[1:-1].split(';')
         self.matrix_content = self.cleaned_input
 
         if not self.check_uniformity():
@@ -144,7 +144,7 @@ class Matrix:
         return
         # если обределяем в отцовском классе то, там и  можно прописать
 
-    def ro(self, i): # !!!!!!!!!! static nad in utils
+    def ro(self, i): # !!!!!!!!!! static nad in utils DEL IT
         if i % 1 == 0:
             return int(f'{i:.{0}f}')
         else:
@@ -180,7 +180,7 @@ class Matrix:
         return rotated
 
     @staticmethod
-    def round_elems_matrix(m_list :list, precision=4):
+    def round_elems_matrix(m_list, precision=4):
         for row in range(len(m_list)):
             for col in range(len(m_list)):
                 m_list[row][col] = round(m_list[row][col], precision)
@@ -241,7 +241,7 @@ class Matrix:
         return matrix_class
 
     @staticmethod # maybe it can be common func in utils
-    def check_available_signs(expression: str):
+    def check_available_signs(expression):
         expression = expression.replace('^', '**')
         # +-/*% - availible signs
         try:
@@ -255,14 +255,14 @@ class Matrix:
 
 
     @staticmethod
-    def add_classes(expression: str) -> str:
+    def add_classes(expression):
         # use sub for cheeck with ones
         matches = list(set(re.findall(Matrix.REG, expression)))
         for m in range(len(matches)):
             expression = expression.replace(matches[m], f"Matrix('{matches[m]}')")
         return expression
 
-    def __mod__(self, other):
+    def __mod__(self, other): # maybe unneccesary
         pass        
 
 

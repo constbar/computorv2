@@ -1,11 +1,23 @@
-# # @staticmethod
-# def try_int(digit):
-#     if digit == 0:
-#         return 0
-#     if -1 < digit < 1:
-#         return digit
-#     try:
-#         is_int = digit % int(digit) == 0
-#     # except OverflowError:
-#         # sys.exit('number is too big. number should not be inf')
-#     return int(digit) if is_int else digit
+import re
+import sys
+
+class Utils:
+
+    @staticmethod
+    def clean_signs(raw_str):
+        raw_str = raw_str.replace('-+', '-')
+        raw_str = raw_str.replace('++', '+')
+        raw_str = raw_str.replace('+-', '-')
+        raw_str = raw_str.replace('/+', '/') # is it neccesary?
+        raw_str = raw_str.replace(')C', ')+C')
+        raw_str = raw_str.replace('/(+C', '/(C')
+        return raw_str
+
+    @staticmethod
+    def try_int(num):
+        if num % 1 == 0:
+            return int(f'{num:.{0}f}')
+        else:
+            return num # . maybe 4 round
+
+

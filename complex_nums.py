@@ -9,30 +9,21 @@ from termcolor import colored
 # make norm rouund in str
 
 class Complex:
-    # need i -+ before reg ex
     REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'
-    def __init__(self, inp: str):
+    def __init__(self, inpt):
         self.re = 0
         self.im = 0
         self.co = False
-        if '+' in inp:
-            inp = inp.replace('+', '')
-        if 'i' in inp:  # or big I
+        if '+' in inpt:
+            inpt = inpt.replace('+', '')
+        if 'i' in inpt:  # or big I
             self.co = True
-            if inp == '-i' or inp == 'i':
-                self.im = float(inp.replace('i', '1'))
+            if inpt == '-i' or inpt == 'i':
+                self.im = float(inpt.replace('i', '1'))
             else:
-                self.im = float(inp.strip('i'))
+                self.im = float(inpt.strip('i'))
         else:
-            self.re = float(inp)
-
-    def __str__(self):
-        # if result of calculationsw is 0 -> return 0 and co make false
-        # сделать округление до 6 знака # сделать try int
-        return_dict = dict()
-        return_dict['real'] = self.re
-        return_dict['imag'] = self.im
-        return Complex.make_str_output(return_dict)
+            self.re = float(inpt)
 
     def __add__(self, other):
         self.re = self.re + other.re
@@ -110,8 +101,16 @@ class Complex:
         temp.co = True if temp.im else False
         return temp
 
+    def __str__(self):
+        # if result of calculationsw is 0 -> return 0 and co make false
+        # сделать округление до 6 знака # сделать try int
+        return_dict = dict()
+        return_dict['real'] = self.re
+        return_dict['imag'] = self.im
+        return Complex.make_str_output(return_dict)
+
     # make it better
-    def make_str_output(res_dict: dict) -> str:
+    def make_str_output(res_dict):
         f = ''
         if res_dict['real']:
             f += str(res_dict['real'])
@@ -123,7 +122,7 @@ class Complex:
 
     # this only for i's
     @staticmethod
-    def pow_replacer(part: str, diction=False):
+    def pow_replacer(part, diction=False): # diction not used
         # или part is class regex <class 're.Match'>
         # if type(part).__name__ == 'Match': # need i?
         part = part.group(0).replace('*', '')
@@ -157,7 +156,7 @@ class Complex:
         return '+' + Complex.make_str_output(clx_dict)
 
     @staticmethod
-    def clean_signs(raw_str: str) -> str:
+    def clean_signs(raw_str):
         raw_str = raw_str.replace('-+', '-')
         raw_str = raw_str.replace('++', '+')
         raw_str = raw_str.replace('+-', '-')
@@ -167,7 +166,7 @@ class Complex:
         return raw_str
 
     @staticmethod
-    def simplify_expression(expression: str) -> str:
+    def simplify_expression(expression):
         # для проверки валидности сделать еденичны и эвал чтобы понять ок . не ок,
         result = re.sub(Complex.REG_POW_COMPL, Complex.pow_replacer, expression)
         # print('result', result)
@@ -182,8 +181,8 @@ class Complex:
 # # вычисление
 # print(kek)
 
-# test = (Complex('-30') / Complex('i')) / (Complex('222') + Complex('1') * Complex('i'))
-# print(test)
+# test = (Complex('i**2'))# / Complex('i')) / (Complex('222') + Complex('1') * Complex('i'))
+# pr/int(test)
 # test = (Complex('5i') * Complex('6i')) / (Complex('2i') - Complex('2i'))
 # test = ((Complex('5i') * Complex('6i')) / Complex('0'))
 # test = (Complex('5i') * Complex('6i')) / (Complex('2i') - Complex('2i'))  -eror here

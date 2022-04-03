@@ -49,16 +49,15 @@ class Handler:
     # can add cls.result
 
     @classmethod
-    def handle_line(cls, inp_line):
+    def handle_line(cls, input_line):
         # добавть может оригинальный инпут для добавления в словарь результатов
-        cls.read_expression(inp_line)
+        cls.read_expression(input_line)
         cls.substitute_vals_dict()
         cls.check_literal_vals()
 
-
     @classmethod
-    def read_expression(cls, inp_line):
-        cls.line = inp_line.lower()
+    def read_expression(cls, input_line):
+        cls.line = input_line.lower()
         cls.line = cls.line.replace('\t', '').replace(' ', '')
 
         if cls.line.count('=') != 1:
@@ -136,7 +135,7 @@ class Handler:
         class_substitution = re.findall(new_asn, complex_expression)
 
         # make func add_classes like in matrices
-        to_execute = ''.join(f"Complex('{i}')" if i not in '-+*/^()' else i for i in class_substitution)
+        to_execute = ''.join(f"Complex('{i}')" if i not in '-+*/^()' else i for i in class_substitution) # %?
         to_execute = Complex.clean_signs(to_execute)        
         
         if to_execute[0] == '-':

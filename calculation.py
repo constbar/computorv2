@@ -3,7 +3,7 @@
 import re
 import sys
 from equation import Eq
-
+# 109 str -> if big pow -> dont oveflow buffer raise
 
 class Calc:
     ERR_DICT = {
@@ -130,8 +130,8 @@ class Calc:
             sys.exit(self.ERR_DICT[4])
         elif re.findall(self.REG_WRG_INP, self.cin):
             sys.exit(self.ERR_DICT[5])
-        elif re.findall(self.REG_AFTER_X, self.cin):
-            sys.exit(self.ERR_DICT[5])
+        # elif re.findall(self.REG_AFTER_X, self.cin):
+        #     sys.exit(self.ERR_DICT[5])
         elif re.findall(r'\^[\D]', self.cin):
             sys.exit(self.ERR_DICT[5])
         elif 'xx' in self.cin.lower():

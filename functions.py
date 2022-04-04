@@ -10,15 +10,13 @@ from itertools import product
 
 # regex vinesti v nachalo
 # unknow n var coul be any num
-# REGs with upper case
-
-
+# проверка на вложенные (   ())
 
 class UnknownVar:
     # class specially made for working with vars in parentheses
     def __init__(self, inpt):
         self.inpt = inpt
-        self.val = None
+        self.value = None
         self.factor = None
         self.power = None
 
@@ -26,7 +24,7 @@ class UnknownVar:
             self.factor = float(inpt)
             self.power = 0
         else:
-            self.val = self.clean_inpt
+            self.value = self.clean_inpt
             self.factor = self.get_factor
             self.power = self.get_power
 
@@ -36,19 +34,19 @@ class UnknownVar:
 
     @property
     def get_factor(self):
-        if self.val.startswith('-x'):
+        if self.value.startswith('-x'):
             return -1.0
-        elif not self.val.startswith('x'):
-            return float(self.val.split('x')[0])
+        elif not self.value.startswith('x'):
+            return float(self.value.split('x')[0])
         else:
             return 1.0
 
     @property
     def get_power(self):
-        if not '^' in self.val:
+        if not '^' in self.value:
             return 1.0
         else:
-            return float(self.val.split('^')[-1])
+            return float(self.value.split('^')[-1])
 
     def __mul__(self, other):
         self.factor *= other.factor
@@ -71,60 +69,43 @@ class UnknownVar:
 
 
 class Function:
-    reg_parentheses = r'\(.*?\)\^\d+'
+    REG_IN_PW_PR = r'\(.*?\)\^\d+'
+    REG_PAR_CONT = r'[-+]?(?:(?:\d+\.\d*[a-z]?)|(?:\d+?[a-z]+)|(?:\d+)|(?:[a-z]))'
+
     def __init__(self, inpt):
-        self.inpt = inpt
-        self.func_content = self.substitute_parentheses() # if it neccesary
-        # self.func_content = self.count_rationals(self.func_content) # if count used 1 time -> make not static
-
-    def substitute_parentheses(self):
-        replaced_par = self.inpt
-        parentheses_list = list(set(re.findall(Function.reg_parentheses, self.inpt)))
-        
-        for i in parentheses_list:
-            replaced_par = replaced_par.replace(i, Function.open_parentheses(i))
-            print(replaced_par)
-
-!        # HERE START OPEN PARENTHESES V IN case of -+ or smth
-
-        # check for minuses i meanr in parentheses
-
-        # print(replaced_par.strip('()'))
-        # replaced_par = replaced_par.strip('()')
-
-        # # print(Calc(f'{replaced_par}=0'))
-        # kek = Calc(f'{replaced_par}=0').get_clean_data()  # rework it
-        # lol = Eq(kek).get_reduced_form()  # rework it
-        # print(lol)
-        sys.exit()
-
-        return replaced_par
+        self.func_content = self.substitute_parentheses(inpt)
 
     @staticmethod
-    def count_rationals(expression):
-        cleaned_expression = expression
-        # onlyu gets lower case
-        reg_not_rat = r'[-+]?(?:(?:\d*\*?[a-z]+)|(?:\d*\.\d*\*?[a-z]+))' # what is it 
-        literal_vals = re.findall(reg_not_rat, expression)
+    def substitute_parentheses(function):
+        repl_par = function
+        par_power_list = list(set(re.findall(Function.REG_IN_PW_PR, function)))
+        if len(par_power_list):
+            for i in sorted(list(set(par_power_list)), key=len, reverse=True):
+                temp = Function.open_parentheses(i).strip('()')
+                temp = Calc(f'{temp}=0').get_clean_data()  # rework it
+                temp = Eq(temp).get_reduced_form()         # rework it
+                repl_par = repl_par.replace(i, f'({temp})')
 
-        for i in sorted(list(set(literal_vals)), key=len, reverse=True):
-            cleaned_expression = cleaned_expression.replace(i, '')
-
-        if not len(re.findall(r'[()*/%^]', cleaned_expression)):
-            rational_result = eval(cleaned_expression)
-            if rational_result < 0:
-                return f"{''.join(literal_vals)}{rational_result}"
-            else:
-                return f"{''.join(literal_vals)}+{rational_result}"
-        return expression
+            if not len(re.findall(r'[*/%]', repl_par)):
+                minus_par = re.findall(r'-\(.*?\)', repl_par)
+                if len(minus_par):
+                    for i in sorted(list(set(minus_par)), key=len, reverse=True):
+                        temp = i.strip('-()').replace('-', '!').replace('+', '-')
+                        temp = '-' + temp.replace('!', '+')
+                        repl_par = repl_par.replace(i, temp)
+                repl_par = '+' + repl_par.replace('(','').replace(')','')
+                kek = Calc(f'{repl_par}=0').get_clean_data()  # rework it
+                lol = Eq(kek).get_reduced_form()              # rework it
+        else:
+            repl_par = repl_par.replace('(', '').replace(')', '')
+            repl_par = Calc(f'{repl_par}=0').get_clean_data()  # rework it
+            repl_par = Eq(repl_par).get_reduced_form()         # rework it
+        return repl_par
 
     @staticmethod
     def open_parentheses(expression):
         value, power = expression.split('^')
-
-        # reg_not_rat = r'[-+]?(?:(?:\d+?[a-z]+)|(?:\d+)|(?:[a-z]))' # old
-        reg_not_rat = r'[-+]?(?:(?:\d+\.\d*[a-z]?)|(?:\d+?[a-z]+)|(?:\d+)|(?:[a-z]))'
-        literal_vals = re.findall(reg_not_rat, value)
+        literal_vals = re.findall(Function.REG_PAR_CONT, value)
 
         fin = deepcopy(literal_vals)
         for i in range(int(power) - 1):
@@ -141,22 +122,25 @@ class Function:
             else:
                 final_output += fin[i].__str__() + '+'
 
-        final_output = '(' + Utils.clean_signs(final_output) + ')' # no need )()
+        final_output = '(' + Utils.clean_signs(final_output) + ')'
         return final_output
-        # return final_output.replace('x^0', '').replace('x^1', 'x')
 
     def __add__(self, other):
         final_result = f'{self.func_content}+{other.func_content}'
         self.func_content = Utils.clean_signs(final_result)
-        return self
-
-    def substitute_operator(self, operator, other):
-        final_result = f'{self.func_content}{operator}({other.func_content})'
-        self.func_content = Utils.clean_signs(final_result)
+        self.func_content = self.substitute_parentheses(self.func_content)
         return self
 
     def __sub__(self, other):
-        return self.substitute_operator('-', other)
+        final_result = f'{self.func_content}-{other.func_content}'
+        self.func_content = Utils.clean_signs(final_result)
+        self.func_content = self.substitute_parentheses(self.func_content)
+        return self
+    
+    def substitute_operator(self, operator, other):
+        final_result = f'({self.func_content}){operator}({other.func_content})'
+        self.func_content = Utils.clean_signs(final_result)
+        return self
 
     def __mul__(self, other):
         return self.substitute_operator('*', other)
@@ -171,6 +155,9 @@ class Function:
         return self.substitute_operator('**', other)
 
     def __str__(self):
+        self.func_content = self.func_content.replace('(+', '(')
+        if self.func_content[0] == '+':
+            self.func_content = self.func_content[1:]
         return self.func_content
 
 
@@ -179,10 +166,18 @@ class Function:
 # fa = Function.('(2 + 5x)^4+20+123+312+123+3452345-(sdfsd)')
 # fa = Function('(2 + 5x)^4+20+123+312+123+3452345+(123+2)^2')
 
-# fa = Function('(2 + 5x)^2')
-fa = Function('(2 + 5x)^2+(4+2x)^2+20-123')
+# fa = Function('(2 + 5x)^2+20-(12)^2')
+# fa = Function('(22 + 5.5x)^3') + Function('(2 + 5x)^2')
+# fa = Function('(2.4 + 5.2*x)^2+20')
+# fa = Function('(2 + 5x)^2+(2 + 5x)^2-(2-2x)^3')
+# fa = Function('(2-2x)^3/123/(2-2x+2+2)^3')
+# fa = Function('(2-2x)^3/123/(2-2x+2/2)^3')
+# fa = Function('(2 + 5x)^2+(4+2x)^2+20-123')
 # fa = Function('(2 + 5x)^2/(4+2x)^2+20x+123+22+21') % Function('(2 + 5x)^2/(4+2x)^3+20x+123+22+21')
-print(fa)
+
+# fa = Function('(2x+(5x+2))^2') # break it !!!!!!!!!!!!! no ( inside ())
+# fa = Function('(2+2)^2') # solve it solution can be  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# print(fa)
 
 # kek = '(4+10x^1+10x^1+25x^2)/(16+8x^1+8x^1+4x^2)+20x+123+22+21%((4+10x^1+10x^1+25x^2)/(64+32x^1+32x^1+16x^2+32x^1+16x^2+16x^2+8x^3)+20x+123+22+21)'
 # kek = kek.replace('x', '*2').replace('^', '**')

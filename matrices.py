@@ -10,7 +10,7 @@ class MatrixException(Exception):
     pass
 
 class Matrix:
-    REG = r'\[(?:\[(?:-?\d+[.]?[d+]?,?)+\];?)+\]'
+    REG = r'\[(?:\[(?:-?\d+[.]?[d+]?,?)+\];?)+\]' # REG MATRIX
     error_dict = {
         1: 'matrix could not be empty',
         2: 'the interior parts of the matrix must be equal',
@@ -141,8 +141,6 @@ class Matrix:
 
     def __rpow__(self, power):
         return 'imposible'  # make good describe
-        return
-        # если обределяем в отцовском классе то, там и  можно прописать
 
     def ro(self, i): # !!!!!!!!!! static nad in utils DEL IT
         if i % 1 == 0:
@@ -241,21 +239,22 @@ class Matrix:
         return matrix_class
 
     @staticmethod # maybe it can be common func in utils
-    def check_available_signs(expression):
+    def check_full_line(expression):
         expression = expression.replace('^', '**')
+
+        # [[1,2,3.3]]^[[1,2,3.3]] cant pow in other matrix
         # +-/*% - availible signs
         try:
             temp = re.sub(Matrix.REG, '1', expression)
-            print('temp', temp)
+            print('temp', temp)             # checking 1
             eval(temp)
         except SyntaxError:
             print('invalid syntax with 1')
             return 'ALARM at check'
         return expression
 
-
     @staticmethod
-    def add_classes(expression):
+    def apply_matrix_classes(expression):
         # use sub for cheeck with ones
         matches = list(set(re.findall(Matrix.REG, expression)))
         for m in range(len(matches)):
@@ -282,5 +281,5 @@ class Matrix:
 
 # expression = Matrix('[[-1,2,2]]') ** 0
 # expression = Matrix('[[]]') ** 0
-expression = Matrix('[[1,2,3,4];[2,3,4,5.2];[1,23,2,3]]')
-print(expression)
+# expression = Matrix('[[1,2,3,4];[2,3,4,5.2];[1,23,2,3]]')
+# print(expression)

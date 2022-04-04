@@ -56,3 +56,14 @@ Handler.handle_line('kek = 123i - 12.3 + 2.0i^14  + 2*12 * 3i / 2.7 / 22.1 * 123
 # inversed
 # expression = '[[1,2,3];[32,1,2];[4,5,6]]**-1'
 # expression = '[[1,3];[4,6]]**-1'
+
+
+
+
+# funcs
+# Handler.handle_line('lol = [[2]]^2') # ok [4]
+# Handler.handle_line('lol = [[1.2,3.3]] * [[1];[2];[10]]') # ok [4]
+# Handler.handle_line('lol = (20x + 123 + 1x^2)^3')
+# Handler.handle_line('lol = (-1x+2)')
+# Handler.handle_line('lol = 1x^11')
+# Handler.handle_line('lol = (2 + 5x)^2')

@@ -1,9 +1,11 @@
 import sys
 from termcolor import colored
-
+# raises here not exits
+# try int becames other func
 
 class Eq:
     # rework it
+    # delete coments in functions
     def __init__(self, data: dict, prec = 1, frac = False, verb=False):
         self.data = data
         self.prec = prec
@@ -13,10 +15,10 @@ class Eq:
         self.results = list()
         self.i_data = self.try_int_data
         self.pol_dgr = self.get_poly_degree
-        if len(self.data) > 3:
-            if self.check_high_poly:
-                self.print_final_result()
-        self.make_calculations()
+        # if len(self.data) > 3:
+        #     if self.check_high_poly:
+        #         self.print_final_result()
+        # self.make_calculations()
         # self.print_final_result()
 
     @property
@@ -39,19 +41,20 @@ class Eq:
                 degree = k
         return degree
 
-    def get_reduced_form(self):
+    def get_reduced_form(self):          # make it noramal
+        # print('self.data', self.data)  #                      DEL
         max_len_of_input = max(map(len, map(str,
             map(int, (self.data.values())))))
         if max_len_of_input > self.prec:
             self.prec = max_len_of_input
-
         red_form = ''
         for i in self.data.keys():
-            red_form += f'{Eq.try_int(self.data[i])} * x^{i}+'
+            if self.data[i]:
+                red_form += f'{Eq.try_int(self.data[i])} * x^{i}+'
         red_form = red_form.replace('+-', ' - ').replace('+', ' + ')
         red_form = '- ' + red_form[1:] if red_form[0] == '-' else red_form
         red_form = red_form[:-2].replace('*', '').replace(' ', '')
-        return red_form.replace('x^0', '').replace('x^1', 'x')
+        return red_form.replace('x^0', '')#.replace('x^1', 'x').replace('1x', 'x')
         # return red_form
 
 

@@ -10,6 +10,7 @@ from termcolor import colored
 
 class Complex:
     REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'
+    REG_CMPLX_VLS = r'(-?\d+\.\d+i|-?\d+i|-?\d*\.\d*|-?\d+|[^ 0-9])'
     def __init__(self, inpt):
         self.re = 0
         self.im = 0
@@ -48,7 +49,7 @@ class Complex:
         fi2 = Complex(f'{self.re * other.im}i')
         sc1 = Complex(f'{self.im * other.re}i')
         if self.co:
-            sc2 = Complex.simplify_expression(f'{self.im * other.im}i^2')
+            sc2 = Complex.exponentiate_line(f'{self.im * other.im}i^2')
             sc2 = Complex.clean_signs(sc2)  # make if more clever
         else:
             sc2 = '0'
@@ -94,7 +95,7 @@ class Complex:
         temp = deepcopy(self)
         if not self.re:
             self.im = self.im ** power.re
-            pw = Complex.simplify_expression(f'i^{int(power.re)}')
+            pw = Complex.exponentiate_line(f'i^{int(power.re)}')
             return Complex(str(self.im)) * Complex(Complex.clean_signs(pw))
         for i in range(int(power.re) - 1):
             temp = temp * self
@@ -155,24 +156,36 @@ class Complex:
         # print(clx_dict['real'], clx_dict['imag'], clx_dict['pwr'])
         return '+' + Complex.make_str_output(clx_dict)
 
-    @staticmethod
+    @staticmethod # make it common func
     def clean_signs(raw_str):
         raw_str = raw_str.replace('-+', '-')
         raw_str = raw_str.replace('++', '+')
         raw_str = raw_str.replace('+-', '-')
-        raw_str = raw_str.replace('/+', '/') # is it neccesary?
+        raw_str = raw_str.replace('/+', '/')
         raw_str = raw_str.replace(')C', ')+C')
         raw_str = raw_str.replace('/(+C', '/(C')
         return raw_str
 
     @staticmethod
-    def simplify_expression(expression):
+    def exponentiate_line(expression):
         # для проверки валидности сделать еденичны и эвал чтобы понять ок . не ок,
         result = re.sub(Complex.REG_POW_COMPL, Complex.pow_replacer, expression)
         # print('result', result)
         return result
 
-# kek = Complex.simplify_expression('3i^2 - 123 + 122i')
+    @staticmethod
+    def apply_complex_classes(values_list):
+        exec_line = ''.join(f"Complex('{i}')" if i not in '-+*/^()' else i for i in values_list)
+        exec_line = Complex.clean_signs(exec_line)        
+        if exec_line[0] == '-':
+            exec_line = "Complex('-1')*" + exec_line[1:]
+        elif exec_line[0] == '+':
+            exec_line = exec_line[1:]
+        return exec_line
+
+
+
+# kek = Complex.exponentiate_line('3i^2 - 123 + 122i')
 # print(kek)
 # kek = Complex.clean_signs(kek)
 # 1 этап заменяем все степени

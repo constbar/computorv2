@@ -5,8 +5,9 @@ import sys
 from termcolor import colored
 
 from complex_nums import Complex
-from matrices import Matrix
-from matrices import MatrixException
+from matrices import MatrixException, Matrix
+from functions import Function
+
 
 # check regex for *   means \d* not d+
 # что если =? будет посередине? или их будет несколько?
@@ -116,6 +117,7 @@ class Handler:
             print('it could be matix or rational expression')
             sys.exit('matrix or rat express')
         elif len(literal_vals) == 1:
+            cls.handle_functions()
             print('func')
             sys.exit('eeeexit')
 
@@ -129,43 +131,43 @@ class Handler:
         # if '[[' -> means matrix and make complex to matrix
         # print(cls.upd_line)
 
-        complex_expression = Complex.simplify_expression(cls.upd_line)
-        complex_expression = Complex.clean_signs(complex_expression)
-        new_asn = r'(-?\d+\.\d+i|-?\d+i|-?\d*\.\d*|-?\d+|[^ 0-9])' # to class vars and rename
-        class_substitution = re.findall(new_asn, complex_expression)
+        cmplx_exp = Complex.exponentiate_line(cls.upd_line) # перенести проверку внутрь класса
+        cmplx_exp = Complex.clean_signs(cmplx_exp)
+        all_values = re.findall(Complex.REG_CMPLX_VLS, cmplx_exp)
+        exec_line = Complex.apply_complex_classes(all_values)
 
-        # make func add_classes like in matrices
-        to_execute = ''.join(f"Complex('{i}')" if i not in '-+*/^()' else i for i in class_substitution) # %?
-        to_execute = Complex.clean_signs(to_execute)        
-        
-        if to_execute[0] == '-':
-            to_execute = "Complex('-1')*" + to_execute[1:]
-        elif to_execute[0] == '+':
-            to_execute = to_execute[1:]
-
-        print('to_execute', to_execute)
-        # try  ! except
-        print(eval(to_execute))
+        try: # return val
+            print(eval(exec_line))
+        # except complex raise
+        except:
+            print('olololo invalid syntax')
+        sys.exit('end of handle complex')
 
     @classmethod
     def handle_matrices(cls):
-        # print(cls.upd_line)
-
-        matrices_expression = Matrix.check_available_signs(cls.upd_line)
-        print(matrices_expression)
-        matrices_expression = Matrix.add_classes(matrices_expression)
-        print(matrices_expression)
+        mtrx_exp = Matrix.check_full_line(cls.upd_line)
+        mtrx_exp = Matrix.apply_matrix_classes(mtrx_exp)
         try:
-            print(eval(matrices_expression))
+            print(eval(mtrx_exp))
         except MatrixException as e:
-            print(e) # make it red
+            print(e) # make it red color
+        except: # try to catch it
+            print('asdasdas syntax')
+        sys.exit('end of matrix exp')
 
-        # sys.exit('end')
+    @classmethod
+    def handle_functions(cls):
+        print('its func handle!    !!')
+        func_exp = Function(cls.upd_line)
+        try:
+            print(func_exp)
+        except: # try to chach this exception
+            print('!!')
+        # print(cls.upd_line)
+        # print('lets rock funcs!')
 
 
 
-
-# Handler.handle_line('lol = [[2]]^2') # ok [4]
-# Handler.handle_line('lol = [[1.2,3.3]] * [[1];[2];[10]]') # ok [4]
+Handler.handle_line('lol = 2i + 123 + 2i^12')
 
 

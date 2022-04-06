@@ -9,8 +9,9 @@ class Calc:
     ERR_DICT = {
         1: 'equation should have only one equal sign',
         2: 'both sides of the equation must be',
-        3: 'expression must have an integer exponent',
-        4: 'expression must have a non-negative exponent',
+        # was made earlier in handler
+        # 3: 'expression must have an integer exponent',
+        # 4: 'expression must have a non-negative exponent',
         5: 'expression can only have allowed syntax',
         6: 'it\'s just a numerical equation. no solution',
         7: 'it\'s an incorrect numerical equation. no solution',

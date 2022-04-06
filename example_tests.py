@@ -44,6 +44,8 @@ Handler.handle_line('kek = 123i - 12.3 + 2.0i^14  + 2*12 * 3i / 2.7 / 22.1 * 123
 # expression = '[[3,3,4];[32,1,3];[4,5,6]]**2.2'
 # expression = '2**[[3,3,4];[32,1,3];[4,5,6]]'
 # Handler.handle_line('lol = [[3,3,4];[32,1,3];[4,5,6]]**-2.2') # ok
+# else: print('is it works???') return self.__mul__(other) # ?? try it
+
 
 
 
@@ -67,3 +69,6 @@ Handler.handle_line('kek = 123i - 12.3 + 2.0i^14  + 2*12 * 3i / 2.7 / 22.1 * 123
 # Handler.handle_line('lol = (-1x+2)')
 # Handler.handle_line('lol = 1x^11')
 # Handler.handle_line('lol = (2 + 5x)^2')
+
+
+

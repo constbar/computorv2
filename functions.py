@@ -8,7 +8,6 @@ from calculation import Calc
 from equation import Eq
 from itertools import product
 
-# regex vinesti v nachalo
 # unknow n var coul be any num
 # проверка на вложенные (   ())
 
@@ -57,17 +56,6 @@ class UnknownVar:
         return f'{Utils.try_int(self.factor)}x^{Utils.try_int(self.power)}'
         # factor countd be 1 and power not be 0 1 при выводе
 
-
-# k = UnknownVar('12') * UnknownVar('12x^23')
-# k = UnknownVar('+3') 
-# print(k)
-# k = UnknownVar('2x^2') * UnknownVar('20*x^30')
-# k = UnknownVar('2x^2') * 20
-# k = 20 * UnknownVar('2x^2') * UnknownVar('x^3')
-# k = 20 * UnknownVar('2x^2')
-# k = UnknownVar('x^0')
-
-
 class Function:
     REG_IN_PW_PR = r'\(.*?\)\^\d+'
     REG_PAR_CONT = r'[-+]?(?:(?:\d+\.\d*[a-z]?)|(?:\d+?[a-z]+)|(?:\d+)|(?:[a-z]))'
@@ -79,7 +67,7 @@ class Function:
     def substitute_parentheses(function):
         repl_par = function
         par_power_list = list(set(re.findall(Function.REG_IN_PW_PR, function)))
-        if len(par_power_list):
+        if len(par_power_list): # list(set repaats here 2 times 
             for i in sorted(list(set(par_power_list)), key=len, reverse=True):
                 temp = Function.open_parentheses(i).strip('()')
                 temp = Calc(f'{temp}=0').get_clean_data()  # rework it
@@ -90,14 +78,15 @@ class Function:
                 minus_par = re.findall(r'-\(.*?\)', repl_par)
                 if len(minus_par):
                     for i in sorted(list(set(minus_par)), key=len, reverse=True):
+#!                        # can use re.sub(r'[()]', '', temp)
                         temp = i.strip('-()').replace('-', '!').replace('+', '-')
                         temp = '-' + temp.replace('!', '+')
                         repl_par = repl_par.replace(i, temp)
-                repl_par = '+' + repl_par.replace('(','').replace(')','')
+                repl_par = '+' + repl_par.replace('(','').replace(')','') # re.sub
                 kek = Calc(f'{repl_par}=0').get_clean_data()  # rework it
                 lol = Eq(kek).get_reduced_form()              # rework it
         else:
-            repl_par = repl_par.replace('(', '').replace(')', '')
+            repl_par = repl_par.replace('(', '').replace(')', '') # re.sub
             repl_par = Calc(f'{repl_par}=0').get_clean_data()  # rework it
             repl_par = Eq(repl_par).get_reduced_form()         # rework it
         return repl_par

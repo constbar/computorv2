@@ -6,6 +6,9 @@ from copy import deepcopy
 from termcolor import colored
 from utils import Utils
 
+class ComplexException(Exception):
+    pass
+
 class Complex:
     REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[iI]\^\d+'
     REG_CMPLX_VLS = r'(-?\d+\.\d+i|-?\d+i|-?\d*\.\d*|-?\d+|[^ 0-9])' # not used??
@@ -78,6 +81,7 @@ class Complex:
             self.re = self.re / denominator.re
             self.im = self.im / denominator.re
         except ZeroDivisionError:
+            # raise Comptex (dont devide on 0)
             return 'dont devide asdfjkhasd 0'
         self.complex = True if self.im else False
         return self
@@ -112,7 +116,7 @@ class Complex:
             f += str(Utils.try_int(res_dict['real']))
         if res_dict['imag']:
             if res_dict['imag'] > 0 and res_dict['real']:
-                f += ' + '
+                f += '+'
             f += str(Utils.try_int(res_dict['imag'])) + 'i'
         return f
 

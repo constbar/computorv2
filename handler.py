@@ -4,7 +4,7 @@ import re
 import sys
 from termcolor import colored
 
-from complex_nums import Complex
+from complex_nums import ComplexException, Complex
 from matrices import MatrixException, Matrix
 from functions import Function
 from utils import Utils
@@ -34,36 +34,41 @@ class Handler:
     REG_FLT_EXP = r'\^(?:(?:\d*\.))'
     REG_NEG_EXP = r'\^(?:(?:-\d))'    
 
-    vals_dict = {'a': '20', 'b': 'asd', 'varC': 'smth'} # make 0 init
-    line = None
+    hist = list()
+    vals = dict()
     key = None
     val = None
-    upd_line = None
+    pre_line = None
+    res_line = None
 
     @classmethod
     def handle_line(cls, input_line):
         cls.read_expression(input_line)
         cls.substitute_vals_dict()
         cls.check_exponent()
-
         cls.exponentiation_rationals()
-        cls.execute_expression()
+        cls.handle_expression()
 
     @classmethod
     def read_expression(cls, input_line):
-        cls.line = input_line.lower()
-        cls.line = cls.line.replace('\t', '').replace(' ', '')
+        if input_line == 'LOL':# delete
+            print(cls.vals)
+            raise
 
-        if cls.line.count('=') != 1:
+        cls.pre_line = input_line.lower()
+        cls.pre_line = cls.pre_line.replace('\t', '').replace(' ', '')
+
+        if cls.pre_line.count('=') != 1:
             raise HandlerException(cls.ERR_DICT[1])
-        elif cls.line.endswith('=?') and not cls.line.startswith('=?'):
+
+        elif cls.pre_line.endswith('=?') and not cls.pre_line.startswith('=?'):
             print('make instant computations')
             return
-        elif not all(cls.line.split('=')):
+        elif not all(cls.pre_line.split('=')):
             raise HandlerException(cls.ERR_DICT[2])
             # maybe make here a flag or smth ..
 
-        cls.key, cls.val = cls.line.split('=') # was else here
+        cls.key, cls.val = cls.pre_line.split('=') # was else here
 
         if cls.key == 'i':
             raise HandlerException(cls.ERR_DICT[3])
@@ -76,101 +81,105 @@ class Handler:
         for i in range(len(val_list)):
             if val_list[i].isalpha():
                 try:
-                    val_list[i] = cls.vals_dict[val_list[i]]
+                    val_list[i] = cls.vals[val_list[i]]
                 except KeyError:
                     continue
-        cls.upd_line = ''.join(val_list)
+        cls.res_line = ''.join(val_list)
 
     @classmethod
     def check_exponent(cls):
-        if re.findall(cls.REG_FLT_EXP, cls.upd_line):
+        if re.findall(cls.REG_FLT_EXP, cls.res_line):
             raise HandlerException(cls.ERR_DICT[33])
-        elif re.findall(cls.REG_NEG_EXP, cls.upd_line):
+        elif re.findall(cls.REG_NEG_EXP, cls.res_line):
             raise HandlerException(cls.ERR_DICT[44])
 
     @classmethod
     def exponentiation_rationals(cls):
         REG_POW_RAT = r'\(?(?:(?:-?\d+\.?\d?))\)?\^[\d+]' # to the beg
-        rat_pow_list = re.findall(REG_POW_RAT, cls.upd_line)
+        rat_pow_list = re.findall(REG_POW_RAT, cls.res_line)
         for i in sorted(list(set(rat_pow_list)), key=len, reverse=True):
             temp = i
             if not '(' in temp:
                 temp = temp.replace('-', '')
             temp = eval(temp.replace('^', '**'))
-            cls.upd_line = cls.upd_line.replace(i, '+' + str(temp))
+            cls.res_line = cls.res_line.replace(i, '+' + str(temp))
 
-        # print('old', cls.upd_line)
-        # print('new', Utils.clean_signs(cls.upd_line))
+        # print('old', cls.res_line)
+        # print('new', Utils.clean_signs(cls.res_line))
 
 
     @classmethod
-    def execute_expression(cls):
+    def handle_expression(cls):
         is_complex = False 
-        literal_vals = list(set(re.findall(r'[a-zA-Z]+', cls.upd_line)))
+        literal_vals = list(set(re.findall(r'[a-zA-Z]+', cls.res_line)))
         try:
             literal_vals.remove('i')
             is_complex = True
         except ValueError:
             pass
 
-        print('before execute', cls.upd_line)
-
         if len(literal_vals) > 1:
             raise HandlerException(cls.ERR_DICT[99])
         elif len(literal_vals) == 0 and is_complex:
             cls.handle_complex()
         elif len(literal_vals) == 0:
-            if '[[' in cls.upd_line:
+            if '[[' in cls.res_line:
                 cls.handle_matrices()
             else:
-                try:
-                    # !
-                    print(eval(cls.upd_line))
-                except:
-                    print('except error!!')
+                cls.val = eval(cls.res_line)
+                cls.prnt_hist_vals()
         elif len(literal_vals) == 1:
             cls.handle_functions()
-        print('end of execute')
 
     @classmethod
     def handle_complex(cls):
-        # Complex.check_full_line(cls.upd_line) !
-        cmplx_exp = Complex.exponentiate_line(cls.upd_line)
+        cmplx_exp = Complex.exponentiate_line(cls.res_line)
         cmplx_exp = Utils.clean_signs(cmplx_exp)
         all_values = re.findall(Complex.REG_CMPLX_VLS, cmplx_exp)
         exec_line = Complex.apply_complex_classes(all_values)
-
-        try: # return val
-            print(eval(exec_line))
-        # except complex raise
-        except:
-            print('olololo invalid syntax')
-        sys.exit()
-
+        # cls.execute_expression(exec_line)
+        cls.val = f'{eval(exec_line)}'
+        cls.prnt_hist_vals()
 
     @classmethod
     def handle_matrices(cls):
-        mtrx_exp = Matrix.check_full_line(cls.upd_line)
-        mtrx_exp = Matrix.apply_matrix_classes(mtrx_exp)
-        try:
-            print(eval(mtrx_exp))
-        except MatrixException as e:
-            print(e) # make it red color
-        except: # try to catch it
-            print('asdasdas syntax')
-        sys.exit()
+        mtrx_exp = Matrix.check_full_line(cls.res_line)
+        exec_line = Matrix.apply_matrix_classes(mtrx_exp)
+        cls.val = f'{eval(exec_line)}'
+        cls.val = cls.val.replace('\n', ';')
+        cls.prnt_hist_vals()
 
     @classmethod
     def handle_functions(cls):
-        print('its func handle!    !!')
-        func_exp = Function(cls.upd_line)
-        try:
-            print(func_exp)
-        except: # try to chach this exception
-            print('!!')
-        sys.exit()
-        # print(cls.upd_line)
-        # print('lets rock funcs!')
+        exec_line = Function(cls.res_line)
+        cls.prnt_hist_vals()
+
+    @classmethod
+    def prnt_hist_vals(cls):
+        print(colored(cls.val, 'green'))
+        cls.vals[cls.key] = cls.val
+
+        # not shure that it needs work like this
+        cls.hist.append(f'{cls.pre_line.split("=")[-1]} -> {cls.val}')
+        print(cls.hist)
+
+
+
+    # @classmethod
+    # def execute_expression(cls, exec_line):
+    #     # try:
+    #     # print(eval(exec_line)) # make colored
+    #     cls.val = f'{eval(exec_line)}'
+    #     print(colored(cls.val, 'green'))
+    #     if '[' in cls.val:
+    #         cls.val = cls.val.replace('\n', ';')
+    #     cls.vals[cls.key] = cls.val
+    #     # except ComplexException as e: # need i?
+    #     #     print(e)
+    #     # except MatrixException as e:
+    #     #     print(colored(e, 'yellow'))
+    #     # except:
+    #     #     print('olololo invalid syntax')
 
 
 
@@ -184,6 +193,9 @@ class Handler:
 # Handler.handle_line('lol = [[1,2,3.3]]^[[1,2,3.3]]') # chekck it/
 # Handler.handle_line('lol = [[1,2];[2,3]] % [12]') # error
 # Handler.handle_line('lol = [[1,2];[2,3]] % 2') # came to [[ and .. none..
-Handler.handle_line('lol = 22^[[1,2];[2,3]]')
+# Handler.handle_line('lol = 22^[[1,2];[2,3]]')
+# 3i902342 error should be error
+# > x = 11233x 1212 # error'
+
 
 

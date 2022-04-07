@@ -10,6 +10,7 @@ from itertools import product
 
 # unknow n var coul be any num
 # проверка на вложенные (   ())
+# make func exceptions
 
 class UnknownVar:
     # class specially made for working with vars in parentheses

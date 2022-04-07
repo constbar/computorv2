@@ -19,7 +19,7 @@ class Utils:
         if num % 1 == 0:
             return int(f'{num:.{0}f}')
         else:
-            return num # . maybe 4 round
+            return num # . maybe 4 round . format
 
 
 

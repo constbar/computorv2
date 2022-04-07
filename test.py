@@ -1,7 +1,9 @@
 from cmd import Cmd
-from handler import Handler
-from handler import HandlerException
 from termcolor import colored
+
+from matrices import MatrixException
+from complex_nums import ComplexException
+from handler import HandlerException, Handler
 
 
 class Comp(Cmd):
@@ -12,7 +14,6 @@ class Comp(Cmd):
     HISTORY = ''
     prompt = '> '
     handler = Handler() # not neccesary
-
 
     def do_exit(self, param):
         print('program closure')
@@ -29,15 +30,33 @@ class Comp(Cmd):
 
     def help_history(self):
         print('show program history')
- 
+
+
     def default(self, line):
         # print("Default: {}".format(line))
         try:
-        	Handler.handle_line(line)
+            Handler.handle_line(line)
         except HandlerException as e:
-        	print(colored(e, 'red'))
+            print(colored(e, 'cyan'))
+        except AttributeError:
+            pass
+        # add here syntax err
 
-        self.HISTORY += line + ' -> ' + 'result\n' 
+        # except ComplexException as e: # need i?
+        #     print(e)
+        except MatrixException as e: # for static exceptions
+            print(colored(e, 'yellow'))
+        except SyntaxError as e:
+            print(colored('invalid syntax', 'yellow'))
+        # except ZeroDivisionError
+
+        # except:
+        #     print('olololo invalid syntax in HAndle')
+        line = ''
+        self.HISTORY += line + ' -> ' + 'result\n'
+
+    def emptyline(self):
+        pass
 
     do_EOF = do_exit
     help_EOF = help_exit

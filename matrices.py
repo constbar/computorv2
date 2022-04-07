@@ -146,14 +146,15 @@ class Matrix:
         raise MatrixException(Matrix.M_ERR_D[11])
 
     def __str__(self):
-        print('result')
         for row in range(self.rows):
             for col in range(self.cols):
                 self.matrix_content[row][col] = \
                 Utils.try_int(self.matrix_content[row][col])
         return_str= ''
-        for i in self.matrix_content:
-            return_str += str(i) + '\n'
+        for i in range(len(self.matrix_content)):
+            return_str += str(self.matrix_content[i])
+            if i != len(self.matrix_content) - 1:
+                return_str += '\n'
         return return_str
 
     @staticmethod
@@ -243,8 +244,10 @@ class Matrix:
             if temp == '1**1':
                 raise MatrixException(Matrix.M_ERR_D[11])
             eval(temp)
-        except SyntaxError:
-            raise MatrixException(Matrix.M_ERR_D[12])
+        except SyntaxError: # test it
+            pass
+            # raise
+            # raise MatrixException(Matrix.M_ERR_D[12])
         return expression
 
     @staticmethod

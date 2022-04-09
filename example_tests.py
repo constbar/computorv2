@@ -71,4 +71,27 @@ Handler.handle_line('kek = 123i - 12.3 + 2.0i^14  + 2*12 * 3i / 2.7 / 22.1 * 123
 # Handler.handle_line('lol = (2 + 5x)^2')
 
 
+# complex
+# Handler.handle_line('x=(20)^2 +(-20)^2 + 12^3 + 3i^2') # ok
+# Handler.handle_line('x=(3i^4)^2') # good
+# Handler.handle_line('x=(3i^2)^1') # good
+# Handler.handle_line('x=(3i^3)^4') # good
 
+
+# Handler.handle_line('x=3i^2 - 123 + 122i') # -126+122i
+# Handler.handle_line('x=5.5^2 * 2i') # 60.5i
+
+# matrix
+# Handler.handle_line('x=[[1.2, -2, 3]] * 4') # ok [4.8, -8, 12]
+# Handler.handle_line('x = [[-11,2,2];[1,2,3]] ** [[-11];[3];[123]]')
+# Handler.handle_line('x=[[1];[2];[3]]**[[1.1,2,3]]')
+# Handler.handle_line('x=[[1,2,3]]**[[1];[2];[3]]')
+
+# Handler.handle_line('x=[[-11,2,2]] * [[2,10,5]]')
+# Handler.handle_line('x=[[-11,2,2]] ** [[2,10,5]]') # good err
+# Handler.handle_line('x=[[-11,2,2]]')
+# Handler.handle_line('x=[[-11,2,2];[1,2,3]] ** [[2];[3];[1]]')
+
+# Handler.handle_line('x=[[-1,2,2]]**0')
+# Handler.handle_line('x=[[0]]**0')
+# Handler.handle_line('x=[[]]**0')

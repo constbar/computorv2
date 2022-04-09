@@ -10,6 +10,7 @@ class Utils:
         raw_str = raw_str.replace('/+', '/') # is it neccesary?
         raw_str = raw_str.replace(')C', ')+C')
         raw_str = raw_str.replace('/(+C', '/(C')
+        raw_str = raw_str.replace('(+Co', '(Co')
         raw_str = raw_str.replace('*+', '*')
         # raw_str = raw_str.replace('/+', '/') # not used yet
         return raw_str
@@ -19,7 +20,9 @@ class Utils:
         if num % 1 == 0:
             return int(f'{num:.{0}f}')
         else:
-            return num # . maybe 4 round . format
+            return f'{round(num, 4)}'
+            # return f'{num:.{4}f}'
+            # return num # . maybe 4 round . format
 
 
 

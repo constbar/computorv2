@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from cmd import Cmd
 from termcolor import colored
 
@@ -38,7 +40,11 @@ class Comp(Cmd):
             Handler.handle_line(line)
         except HandlerException as e:
             print(colored(e, 'cyan'))
+        except ComplexException as e:
+            print(colored(e, 'cyan'))
+
         except AttributeError:
+            # print('attrib error')
             pass
         # add here syntax err
 
@@ -46,8 +52,12 @@ class Comp(Cmd):
         #     print(e)
         except MatrixException as e: # for static exceptions
             print(colored(e, 'yellow'))
-        except SyntaxError as e:
-            print(colored('invalid syntax', 'yellow'))
+        except TypeError:
+            print('asd')
+            # FunctionException
+        # except SyntaxError as e:
+        #     print(e)
+        #     print(colored('invalid syntax', 'yellow'))
         # except ZeroDivisionError
 
         # except:

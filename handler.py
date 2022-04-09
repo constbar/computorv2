@@ -10,6 +10,10 @@ from functions import Function
 from utils import Utils
 
 # case sensetive should be turned off
+# what to do with big I
+# need dpu the in all exceptioons
+# write here about all regex
+
 
 class HandlerException(Exception):
     pass
@@ -24,6 +28,8 @@ class Handler:
         33: 'expression must have an integer exponent',
         44: 'expression must have a non-negative exponent',
         99: 'too many unknown vars for expression',
+
+        88: 'invalid syntax for complex expression'
         #        # 5: 'expression can only have allowed syntax',
         #        # 6: 'it\'s just a numerical equation. no solution',
         #        # 7: 'it\'s an incorrect numerical equation. no solution',
@@ -32,7 +38,10 @@ class Handler:
 
     REG_ALWD_SMBLS = r'(\d+\.\d+|\w+|[^ 0-9])'
     REG_FLT_EXP = r'\^(?:(?:\d*\.))'
-    REG_NEG_EXP = r'\^(?:(?:-\d))'    
+    REG_NEG_EXP = r'\^(?:(?:-[2-9]))'
+    
+    REG_POW_RAT = r'(?:(?:-?\d+\.?\d?))\^[\d+]'
+    REG_RAT_POW_BRT = r'\(-?\d+\.?\d+\)\^\d+'
 
     hist = list()
     vals = dict()
@@ -52,7 +61,7 @@ class Handler:
     @classmethod
     def read_expression(cls, input_line):
         if input_line == 'LOL':# delete
-            print(cls.vals)
+            print(cls.vals) # shiouild be in test.py
             raise
 
         cls.pre_line = input_line.lower()
@@ -63,12 +72,17 @@ class Handler:
 
         elif cls.pre_line.endswith('=?') and not cls.pre_line.startswith('=?'):
             print('make instant computations')
-            return
+            return # 
         elif not all(cls.pre_line.split('=')):
             raise HandlerException(cls.ERR_DICT[2])
             # maybe make here a flag or smth ..
 
-        cls.key, cls.val = cls.pre_line.split('=') # was else here
+        cls.key, cls.val = cls.pre_line.split('=')
+
+
+        if cls.key in cls.vals.keys():
+            print(cls.vals[cls.key])
+            raise
 
         if cls.key == 'i':
             raise HandlerException(cls.ERR_DICT[3])
@@ -95,18 +109,22 @@ class Handler:
 
     @classmethod
     def exponentiation_rationals(cls):
-        REG_POW_RAT = r'\(?(?:(?:-?\d+\.?\d?))\)?\^[\d+]' # to the beg
-        rat_pow_list = re.findall(REG_POW_RAT, cls.res_line)
+        """
+        replacing all rational exponents without brackets
+        replacing all rational exponents with brackets
+
+        """
+        rat_pow_list = re.findall(Handler.REG_POW_RAT, cls.res_line)
         for i in sorted(list(set(rat_pow_list)), key=len, reverse=True):
             temp = i
-            if not '(' in temp:
-                temp = temp.replace('-', '')
             temp = eval(temp.replace('^', '**'))
             cls.res_line = cls.res_line.replace(i, '+' + str(temp))
 
-        # print('old', cls.res_line)
-        # print('new', Utils.clean_signs(cls.res_line))
-
+        rat_pow_brt_list = re.findall(Handler.REG_RAT_POW_BRT, cls.res_line)
+        for i in sorted(list(set(rat_pow_brt_list)), key=len, reverse=True):
+            temp = i
+            temp = eval(temp.replace('^', '**'))
+            cls.res_line = cls.res_line.replace(i, '+' + str(temp))
 
     @classmethod
     def handle_expression(cls):
@@ -133,11 +151,13 @@ class Handler:
 
     @classmethod
     def handle_complex(cls):
+        if re.findall(Complex.REG_WRG_INP_I, cls.res_line):
+            raise ComplexException(cls.ERR_DICT[88])
         cmplx_exp = Complex.exponentiate_line(cls.res_line)
         cmplx_exp = Utils.clean_signs(cmplx_exp)
         all_values = re.findall(Complex.REG_CMPLX_VLS, cmplx_exp)
         exec_line = Complex.apply_complex_classes(all_values)
-        # cls.execute_expression(exec_line)
+        exec_line = Utils.clean_signs(exec_line)
         cls.val = f'{eval(exec_line)}'
         cls.prnt_hist_vals()
 
@@ -146,42 +166,71 @@ class Handler:
         mtrx_exp = Matrix.check_full_line(cls.res_line)
         exec_line = Matrix.apply_matrix_classes(mtrx_exp)
         cls.val = f'{eval(exec_line)}'
-        cls.val = cls.val.replace('\n', ';')
+        # cls.val = cls.val.replace('\n', ';')  # printed val ot the same as stored
         cls.prnt_hist_vals()
 
     @classmethod
     def handle_functions(cls):
-        exec_line = Function(cls.res_line)
+        cls.val = Function(Function(cls.res_line).__str__())
         cls.prnt_hist_vals()
 
     @classmethod
     def prnt_hist_vals(cls):
-        print(colored(cls.val, 'green'))
+        # print(colored(cls.val, 'green'))
+        print((cls.val))
         cls.vals[cls.key] = cls.val
 
         # not shure that it needs work like this
-        cls.hist.append(f'{cls.pre_line.split("=")[-1]} -> {cls.val}')
-        print(cls.hist)
+        # cls.hist.append(f'{cls.pre_line.split("=")[-1]} -> {cls.val}')
+        # print(cls.hist)
+
+
+# Handler.handle_line('lol = 3i + 23')
+# Handler.handle_line('lol = [[1,2];[2,3]]^-1')
+# Handler.handle_line('x=[[1]]^[[2]]') # good error
+
+
+# Handler.handle_line('x= (5i)^0') # 1 good
+# Handler.handle_line('x=i1')
+# Handler.handle_line('x=x1x')
+# Handler.handle_line('x=((1x + 12))^2') # good err
+# Handler.handle_line('x=(1x + 12)^2')
+# Handler.handle_line('x=(2 + 5x)^4+200+123+x^2 + (x)^2+1000')
+# fa = Function.('(2 + 5x)^4+20+123+312+123+3452345-(sdfsd)')
+# fa = Function('(2 + 5x)^4+20+123+312+123+3452345+(123+2)^2')
+
+# fa = Function('(2 + 5x)^2+20-(12)^2')
+# fa = Function('(22 + 5.5x)^3') + Function('(2 + 5x)^2')
+# fa = Function('(2.4 + 5.2*x)^2+20')
+# fa = Function('(2 + 5x)^2+(2 + 5x)^2-(2-2x)^3')
+# fa = Function('(2-2x)^3/123/(2-2x+2+2)^3')
+# fa = Function('(2-2x)^3/123/(2-2x+2/2)^3')
+# fa = Function('(2 + 5x)^2+(4+2x)^2+20-123')
+# fa = Function('(2 + 5x)^2/(4+2x)^2+20x+123+22+21') % Function('(2 + 5x)^2/(4+2x)^3+20x+123+22+21')
+
+# fa = Function('(2x+(5x+2))^2') # break it !!!!!!!!!!!!! no ( inside ())
+# fa = Function('(2+2)^2') # solve it solution can be  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# print(fa)
+
+# kek = '(4+10x^1+10x^1+25x^2)/(16+8x^1+8x^1+4x^2)+20x+123+22+21%((4+10x^1+10x^1+25x^2)/(64+32x^1+32x^1+16x^2+32x^1+16x^2+16x^2+8x^3)+20x+123+22+21)'
+# kek = kek.replace('x', '*2').replace('^', '**')
+# print(eval(kek))
+
+# fa = Function.open_brackets('(2-1.5x)^13')
+# fa = Function('x+2+2xx+2-3+1-1-2-200-2.2x+x+123+12*x+12.2') + Function('+2+x+2-3+1-1-2+200')
+# fa = Function('x+2+2xx+2-3+1-1-2-200-2.2x+x+123+12*x+12.2') ** Function('+2+x+2-3+1-1-2+200')
+# fa = Function('+2+x+2-3+1-1-2+200')
+# fa = Function('x+x+2x+3x+10x+23+23-10x-10*x/12')
+# fa = Function('+2+2x+2-3+1-1-2+200')# + Function('+2+x+2-3+1-1-2+200')
+# print(fa)
+# need pow tests
 
 
 
-    # @classmethod
-    # def execute_expression(cls, exec_line):
-    #     # try:
-    #     # print(eval(exec_line)) # make colored
-    #     cls.val = f'{eval(exec_line)}'
-    #     print(colored(cls.val, 'green'))
-    #     if '[' in cls.val:
-    #         cls.val = cls.val.replace('\n', ';')
-    #     cls.vals[cls.key] = cls.val
-    #     # except ComplexException as e: # need i?
-    #     #     print(e)
-    #     # except MatrixException as e:
-    #     #     print(colored(e, 'yellow'))
-    #     # except:
-    #     #     print('olololo invalid syntax')
 
 
+# Handler.handle_line('lol = 12i2123') # ok error shiould come
+# Handler.handle_line('lol = 12i + 123-123+2+2^2')
 
 # Handler.handle_line('lol = 2123 + 12i')
 # Handler.handle_line('lol = (-12.2)^2 + (12.2)^2')

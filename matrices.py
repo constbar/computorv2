@@ -1,34 +1,32 @@
-#!/usr/bin/python3
-
 import re
-import sys
-
-from copy import deepcopy
-import utils
 from utils import Utils
+from copy import deepcopy
 
 class MatrixException(Exception):
     pass
 
 class Matrix:
-    REG_MTRX = r'\[(?:\[(?:-?\d+[.]?[d+]?,?)+\];?)+\]'
+    """
+    REG_POW_MAT - checks if the matrix is raised to the power of the matrix
+    REG_MTRX - finds all matrices in an expression
+    """
     M_ERR_D = {
         1: 'matrix could not be empty',
         2: 'the interior parts of the matrix must be equal',
-        3: 'invalid content of matrix',
+        3: 'invalid matrix content',
         4: 'both matrices must be the same size',
-        5: 'matrices should be equal for term-to-term multiplication',
+        5: 'matrices must be equal for termwise multiplication',
         6: 'the columns of the first matrix must be equal to the rows of the second',
-        7: 'power of matrix must be an integer',
+        7: 'the degree of the matrix must be an integer',
         8: 'matrix must be square',
-        9: 'power of matrix should be greater than 0',
-        10: 'determinant is equal 0. there is no clear solution',
-
+        9: 'matrix power must be greater than 0',
+        10: 'the determinant is 0. there is no unique solution',
         11: 'matrix couldn\'t be an exponent',
-        12: 'invalid matrix syntax'
-        # 11: 'matrix cannot be inverted', # not used
-
+        12: 'invalid syntax for matrix expression'
     }
+
+    REG_POW_MAT = r'\]\^-?\['
+    REG_MTRX = r'\[(?:\[(?:-?\d+[.]?[d+]?,?)+\];?)+\]'
 
     def __init__(self, inpt):
         if inpt == '[[]]':
@@ -86,14 +84,15 @@ class Matrix:
                         self.matrix_content[row][col] *= other.matrix_content[row][col]
             else:
                 raise MatrixException(Matrix.M_ERR_D[5])
+        self.recalculate_matrix()
         return self
-
 
     def __rmul__(self, other):
         if isinstance(other, int) or isinstance(other, float):
             for row in range(self.rows):
                 for col in range(self.cols):
                     self.matrix_content[row][col] *= other
+        self.recalculate_matrix()
         return self
 
     def __truediv__(self, other):
@@ -117,6 +116,7 @@ class Matrix:
             if self.inversed or other.inversed:
                 self.matrix_content = self.round_elems_matrix(self.matrix_content, 0)
                 self.inversed = False
+            self.recalculate_matrix()
             return self
 
         elif not round(power) == power:
@@ -129,6 +129,7 @@ class Matrix:
                     if row == col:
                         identity_matrix[row][col] = 1
             self.matrix_content = identity_matrix
+            self.recalculate_matrix()
             return self
         elif self.rows != self.cols:
             raise MatrixException(Matrix.M_ERR_D[8])
@@ -140,22 +141,23 @@ class Matrix:
         temp = deepcopy(self)
         for i in range(power - 1):
             temp = temp * self
+        temp.recalculate_matrix()
         return temp
 
     def __rpow__(self, power):
         raise MatrixException(Matrix.M_ERR_D[11])
 
     def __str__(self):
-        for row in range(self.rows):
-            for col in range(self.cols):
-                self.matrix_content[row][col] = \
-                Utils.try_int(self.matrix_content[row][col])
-        return_str= ''
+        return_str = ''
         for i in range(len(self.matrix_content)):
-            return_str += str(self.matrix_content[i])
+            return_str += str(list(map(Utils.try_int, self.matrix_content[i])))
             if i != len(self.matrix_content) - 1:
                 return_str += '\n'
         return return_str
+
+    def recalculate_matrix(self):
+        self.rows = len(self.matrix_content)
+        self.cols = len(self.matrix_content[0])
 
     @staticmethod
     def make_empty_matrix(rows_num, cols_num):
@@ -234,20 +236,19 @@ class Matrix:
 
         matrix_class.matrix_content = Matrix.round_elems_matrix(matrix_class.matrix_content)        
         matrix_class.inversed = True
+        matrix_class.recalculate_matrix()
         return matrix_class
 
     @staticmethod
     def check_full_line(expression):
+        if re.findall(Matrix.REG_POW_MAT, expression):
+            raise MatrixException(Matrix.M_ERR_D[11])
         expression = expression.replace('^', '**')
         try:
             temp = re.sub(Matrix.REG_MTRX, '1', expression)
-            if temp == '1**1':
-                raise MatrixException(Matrix.M_ERR_D[11])
             eval(temp)
-        except SyntaxError: # test it
-            pass
-            # raise
-            # raise MatrixException(Matrix.M_ERR_D[12])
+        except SyntaxError:
+            raise MatrixException(Matrix.M_ERR_D[12])
         return expression
 
     @staticmethod
@@ -255,24 +256,4 @@ class Matrix:
         matches = list(set(re.findall(Matrix.REG_MTRX, expression)))
         for m in range(len(matches)):
             expression = expression.replace(matches[m], f"Matrix('{matches[m]}')")
-        return expression     
-
-
-# x =  Matrix('[1.2,-2,3]') * 4 # ok 
-# x =  Matrix('[[-11,2,2];[1,2,3]]') * Matrix('[[-11];[3];[123]]')
-# x =  Matrix('[[-11,2,2]]') * Matrix('[[2,10,5]]')
-# x =  Matrix('[[-11,2,2]]') ** Matrix('[[2,10,5]]')
-# x =  Matrix('[[-11,2,2];[1,2,3]]') ** Matrix('[[2];[3];[1]]')
-# x =  Matrix('[[-11,2,2];[1,2,3];[2,3,4];[6.2,7,8]]') ** Matrix('[[2];[3];[1]]')
-
-
-# x =  Matrix('[[-11,2.2.2,2]]')
-
-
-# print(x)
-
-
-# expression = Matrix('[[-1,2,2]]') ** 0
-# expression = Matrix('[[]]') ** 0
-# expression = Matrix('[[1,2,3,4];[2,3,4,5.2];[1,23,2,3]]')
-# print(expression)
+        return expression

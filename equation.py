@@ -41,7 +41,11 @@ class Eq:
                 degree = k
         return degree
 
-    def get_reduced_form(self):          # make it noramal
+    def get_reduced_form(self):
+        #1 factor countd be 1 and power not be 0 1 при выводе
+
+        #2 can use re.sub(r'[()]', '', temp)
+              # make it noramal
         # print('self.data', self.data)  #                      DEL
         max_len_of_input = max(map(len, map(str,
             map(int, (self.data.values())))))

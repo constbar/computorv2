@@ -153,7 +153,7 @@ class Matrix:
             return_str += str(list(map(Utils.try_int, self.matrix_content[i])))
             if i != len(self.matrix_content) - 1:
                 return_str += '\n'
-        return return_str
+        return return_str.replace(' ','')
 
     def recalculate_matrix(self):
         self.rows = len(self.matrix_content)

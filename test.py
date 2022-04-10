@@ -7,15 +7,11 @@ from matrices import MatrixException
 from complex_nums import ComplexException
 from handler import HandlerException, Handler
 
+# need i colored print here?
+
 
 class Comp(Cmd):
-    INPUT_CONFIG = {
-        # 1: ''
-    }
-    
-    HISTORY = ''
     prompt = '> '
-    handler = Handler() # not neccesary
 
     def do_exit(self, param):
         print('program closure')
@@ -25,17 +21,28 @@ class Comp(Cmd):
         print('exit from the program. ctrl-d or \'exit\'')
 
     def do_history(self, param):
-        if not len(self.HISTORY):
-            print('history is empty')
+        if Handler.hist:
+            for i in Handler.hist:
+                print(i)
         else:
-            print(self.HISTORY[:-1])
+            print('command history with results is empty')
 
     def help_history(self):
-        print('show program history')
+        print('show command history with results')
+
+    def do_variables(self, param):
+        if Handler.vals.keys():
+            for k, v in Handler.vals.items():
+                print(k, ': ', v, sep='')
+        else:
+            print('list of saved variables is empty')
+
+
+    def help_variables(self):
+        print('display a list of saved variables and their values')
 
 
     def default(self, line):
-        # print("Default: {}".format(line))
         try:
             Handler.handle_line(line)
         except HandlerException as e:
@@ -52,8 +59,8 @@ class Comp(Cmd):
         #     print(e)
         except MatrixException as e: # for static exceptions
             print(colored(e, 'yellow'))
-        except TypeError:
-            print('asd')
+        # except TypeError:
+            # print('asd')
             # FunctionException
         # except SyntaxError as e:
         #     print(e)
@@ -62,8 +69,7 @@ class Comp(Cmd):
 
         # except:
         #     print('olololo invalid syntax in HAndle')
-        line = ''
-        self.HISTORY += line + ' -> ' + 'result\n'
+        line = '' # need i?
 
     def emptyline(self):
         pass

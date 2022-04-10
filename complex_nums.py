@@ -14,6 +14,7 @@ class Complex:
     C_ERR_D = {
         1: 'division by zero',
         2: 'exponent must be an integer',
+        3: 'invalid syntax for complex expression'
     }
 
     REG_WRG_INP_I = r'[i]\d'

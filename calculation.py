@@ -5,6 +5,9 @@ import sys
 from equation import Eq
 # 109 str -> if big pow -> dont oveflow buffer raise
 
+class ComplexException(Exception):
+    pass # ???????????????
+
 class Calc:
     ERR_DICT = {
         1: 'equation should have only one equal sign',
@@ -135,5 +138,5 @@ class Calc:
         #     sys.exit(self.ERR_DICT[5])
         elif re.findall(r'\^[\D]', self.cin):
             sys.exit(self.ERR_DICT[5])
-        elif 'xx' in self.cin.lower():
+        elif 'xx' in self.cin.lower(): # maybe unessesary
             sys.exit(self.ERR_DICT[5])

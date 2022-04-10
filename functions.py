@@ -31,6 +31,8 @@ class UnknownVar:
     def get_factor(self):
         if self.value.startswith('-x'):
             return -1
+        elif self.value.startswith('+x'):
+            return 1
         elif not self.value.startswith('x'):
             return float(self.value.split('x')[0])
         else:
@@ -62,7 +64,11 @@ class Function:
     """
     F_ERR_D = {
         1: 'invalid syntax for function expression',
-        2: 'the program doesn\'t process nested brackets'
+        2: 'the program doesn\'t process nested brackets',
+        3: 'the first part must contain the keyword \'fun\'',
+        4: 'variable function must be the same as in the expression',
+        5: 'unknown variable must not have been initialized before',
+        6: 'the function cannot be opened because it is not in the variables'
     }
 
     REG_WRG_INP_L = r'[a-z]\d'
@@ -70,6 +76,7 @@ class Function:
     REG_PAR_CONT = r'[-+]?(?:(?:\d+\.\d*[a-z]?)|(?:\d+?[a-z]+)|(?:\d+)|(?:[a-z]))'
 
     def __init__(self, inpt):
+        # print(inpt)
         if len(re.findall(Function.REG_WRG_INP_L, inpt)):
             raise FunctionException(Function.F_ERR_D[1])
         self.func_content = self.substitute_parentheses(inpt)
@@ -84,7 +91,6 @@ class Function:
         par_power_list = list(set(re.findall(Function.REG_IN_PW_PR, function)))
         if len(par_power_list): # list(set repaats here 2 times
             for i in sorted(list(set(par_power_list)), key=len, reverse=True):
-                print(i)
                 if '(' in i[1:]:
                     raise FunctionException(Function.F_ERR_D[2])
                 temp = Function.open_parentheses(i).strip('()')

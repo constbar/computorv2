@@ -4,9 +4,9 @@ import re
 import sys
 from termcolor import colored
 
-from complex_nums import ComplexException, Complex
-from matrices import MatrixException, Matrix
-from functions import Function
+from complex_nums import Complex, ComplexException
+from matrices import Matrix
+from functions import Function, FunctionException
 from utils import Utils
 
 # case sensetive should be turned off
@@ -29,7 +29,7 @@ class Handler:
         44: 'expression must have a non-negative exponent',
         99: 'too many unknown vars for expression',
 
-        88: 'invalid syntax for complex expression'
+        # 88: 
         #        # 5: 'expression can only have allowed syntax',
         #        # 6: 'it\'s just a numerical equation. no solution',
         #        # 7: 'it\'s an incorrect numerical equation. no solution',
@@ -44,14 +44,19 @@ class Handler:
     REG_RAT_POW_BRT = r'\(-?\d+\.?\d+\)\^\d+'
 
     hist = list()
-    vals = dict()
+    # vals = dict()
+    # vals = {'a': 1}
+    vals = {'a': 1, 'func(b)': '2b'}
+    # vals = {'funa': '144+24b^1+1b^2'}
     key = None
     val = None
     pre_line = None
     res_line = None
+    inst_calc = None
 
     @classmethod
     def handle_line(cls, input_line):
+        # обнуление всех значений на всякий
         cls.read_expression(input_line)
         cls.substitute_vals_dict()
         cls.check_exponent()
@@ -60,45 +65,86 @@ class Handler:
 
     @classmethod
     def read_expression(cls, input_line):
-        if input_line == 'LOL':# delete
-            print(cls.vals) # shiouild be in test.py
-            raise
+        cls.inst_calc = False
 
         cls.pre_line = input_line.lower()
         cls.pre_line = cls.pre_line.replace('\t', '').replace(' ', '')
 
+        if cls.pre_line in cls.vals.keys():
+            if '[[' in cls.vals[cls.pre_line]:
+                print(cls.vals[cls.pre_line][1:-1].replace(';', '\n'))
+            else:
+                print(cls.vals[cls.pre_line])
+            raise
+
         if cls.pre_line.count('=') != 1:
             raise HandlerException(cls.ERR_DICT[1])
 
-        elif cls.pre_line.endswith('=?') and not cls.pre_line.startswith('=?'):
-            print('make instant computations')
-            return # 
         elif not all(cls.pre_line.split('=')):
             raise HandlerException(cls.ERR_DICT[2])
-            # maybe make here a flag or smth ..
+        elif cls.pre_line.endswith('=?') and not cls.pre_line.startswith('=?'):
+            cls.inst_calc = True
+            cls.val = cls.pre_line.split('=')[0]
 
-        cls.key, cls.val = cls.pre_line.split('=')
+        if cls.inst_calc is False:
+            cls.key, cls.val = cls.pre_line.split('=')
+            if cls.key == 'i':
+                raise HandlerException(cls.ERR_DICT[3])
+            elif re.search(r'\d', cls.key):
+                # if 'fun' in cls.key:
+                #     print('cls.key in ', cls.key)
+
+                # else:
+                raise HandlerException(cls.ERR_DICT[4])
 
 
-        if cls.key in cls.vals.keys():
-            print(cls.vals[cls.key])
-            raise
-
-        if cls.key == 'i':
-            raise HandlerException(cls.ERR_DICT[3])
-        elif not cls.key.isalpha():
-            raise HandlerException(cls.ERR_DICT[4])
 
     @classmethod
     def substitute_vals_dict(cls):
-        val_list = re.findall(re.compile(cls.REG_ALWD_SMBLS), cls.val)
+        reg_strd_funcs = r'fun[a-z]+\(.*?\)'
+        reg_func = r'fun[a-z]+\(\d+\.?\d+\)' # with number in
+        # print('cls.val   ', cls.val)
+
+        stored_closed_funcs = re.findall(reg_strd_funcs, cls.val)
+        # for repalceing full func like in dictinary stores
+        for i in sorted(list(set(stored_closed_funcs)), key=len, reverse=True):
+            try:
+                cls.val = cls.val.replace(i, cls.vals[i])
+            except KeyError:
+                continue
+
+        print('stored vals', cls.vals)
+        print('input      ', cls.val)
+
+
+        stored_open_funcs = re.findall(reg_func, cls.val)
+        for i in sorted(list(set(stored_closed_funcs)), key=len, reverse=True):
+            stored_value = i[i.find('(') + 1:i.find(')')]
+            look = i[:i.find('(') + 1]
+            for s in cls.vals.keys():
+                stored_letter = s[s.find('(') + 1:s.find(')')]
+                if s.startswith(look):
+                    try:
+                        repl = cls.vals[s].replace(stored_letter, f'*{stored_value}')
+                        cls.val = cls.val.replace(i, repl)
+                    except KeyError:
+                        continue
+
+     !   if re.findall(reg_func, cls.val):
+            raise FunctionException(Function.F_ERR_D[6])
+        print('cls.val    ', cls.val)
+        sys.exit()
+
+        val_list = re.findall(cls.REG_ALWD_SMBLS, cls.val)
         for i in range(len(val_list)):
             if val_list[i].isalpha():
                 try:
-                    val_list[i] = cls.vals[val_list[i]]
+                    val_list[i] = str(cls.vals[val_list[i]])
                 except KeyError:
                     continue
         cls.res_line = ''.join(val_list)
+
+
 
     @classmethod
     def check_exponent(cls):
@@ -146,13 +192,43 @@ class Handler:
             else:
                 cls.val = eval(cls.res_line)
                 cls.prnt_hist_vals()
-        elif len(literal_vals) == 1:
-            cls.handle_functions()
+
+
+        # print(cls.val)
+        # print(cls.val[:cls.val.find('(')])
+
+        elif len(literal_vals) == 1: # could be just else
+            # print(cls.val)
+            #if it not int or float /cant repalce it
+            # if not cls.key.startswith('fun'):
+            #     raise FunctionException(Function.F_ERR_D[3])
+            # key_var = cls.key[cls.key.find('(') + 1:cls.key.find(')')]
+            # # print(key_var)
+            # if key_var != literal_vals[0]:
+            #     raise FunctionException(Function.F_ERR_D[4])
+
+            # elif key_var in cls.vals.keys():
+            #     raise FunctionException(Function.F_ERR_D[5])
+            # print(literal_vals[0])
+
+            # print(cls.res_line)
+            # sys.exit()
+
+            # if 'fun' in cls.key():
+            cls.res_line = cls.res_line.replace(literal_vals[0], 'x')
+            # print('res      ', cls.res_line)
+
+            # cls.res_line = cls.res_line.replace(literal_vals[0], 'x')
+            # print(cls.res_line)
+            # cls.handle_functions()
+            # print(cls.val)
+            # sys.exit()
+            cls.handle_functions(literal_vals[0])
 
     @classmethod
     def handle_complex(cls):
         if re.findall(Complex.REG_WRG_INP_I, cls.res_line):
-            raise ComplexException(cls.ERR_DICT[88])
+            raise ComplexException(Complex.C_ERR_D[3])
         cmplx_exp = Complex.exponentiate_line(cls.res_line)
         cmplx_exp = Utils.clean_signs(cmplx_exp)
         all_values = re.findall(Complex.REG_CMPLX_VLS, cmplx_exp)
@@ -166,23 +242,58 @@ class Handler:
         mtrx_exp = Matrix.check_full_line(cls.res_line)
         exec_line = Matrix.apply_matrix_classes(mtrx_exp)
         cls.val = f'{eval(exec_line)}'
-        # cls.val = cls.val.replace('\n', ';')  # printed val ot the same as stored
         cls.prnt_hist_vals()
 
     @classmethod
-    def handle_functions(cls):
-        cls.val = Function(Function(cls.res_line).__str__())
+    def handle_functions(cls, key_var):
+    # def handle_functions(cls):
+        # try eval there
+        cls.val = str(Function(Function(cls.res_line).__str__()))
+        cls.val = cls.val.replace('x', key_var)
         cls.prnt_hist_vals()
 
     @classmethod
     def prnt_hist_vals(cls):
-        # print(colored(cls.val, 'green'))
-        print((cls.val))
-        cls.vals[cls.key] = cls.val
 
-        # not shure that it needs work like this
-        # cls.hist.append(f'{cls.pre_line.split("=")[-1]} -> {cls.val}')
-        # print(cls.hist)
+        # print(colored(cls.val, 'green'))
+        if '[[' in str(cls.val):
+            print(cls.val[1:-1])
+        else:
+            print(cls.val)
+
+        if cls.inst_calc is False:
+            # if 'fun' in cls.key:
+                # cls.key = cls.key[:cls.key.find('(')]
+            if isinstance(cls.val, int) or isinstance(cls.val, float):
+                cls.vals[cls.key] = str(cls.val)
+
+            elif '[' in cls.val:
+                cls.vals[cls.key] = '[' + cls.val.replace('\n', ';') + ']'
+            else:
+                cls.vals[cls.key] = str(cls.val)
+        cls.hist.append(f'{cls.pre_line.split("=")[0]} -> {cls.val}')
+
+        print(cls.vals)
+
+
+
+# unc(b)': '1+1b^1'
+# Handler.handle_line('a = func(x) + func(x)') # good
+# Handler.handle_line('k = func(10) + func(2) + 20') # GOOD
+Handler.handle_line('k = func(10)')
+
+# Handler.handle_line('c = func(x)')
+# Handler.handle_line('c = func(10) + func(10) + 20')
+# Handler.handle_line('funC(c) = c')
+# Handler.handle_line('c = funC(b) + funC(b)') # bad
+# Handler.handle_line('c = funa + funa ')
+
+# Handler.handle_line('funA(10) =? ')
+# Handler.handle_line('fund(b) = (1 + +23 + b)^2') # bad
+# Handler.handle_line('fun(x) = (x + 2x)^2')
+# Handler.handle_line('fun(x) = (x + x)^2')
+
+
 
 
 # Handler.handle_line('lol = 3i + 23')
@@ -192,7 +303,7 @@ class Handler:
 
 # Handler.handle_line('x= (5i)^0') # 1 good
 # Handler.handle_line('x=i1')
-# Handler.handle_line('x=x1x')
+# Handler.handle_line('x=1x')
 # Handler.handle_line('x=((1x + 12))^2') # good err
 # Handler.handle_line('x=(1x + 12)^2')
 # Handler.handle_line('x=(2 + 5x)^4+200+123+x^2 + (x)^2+1000')

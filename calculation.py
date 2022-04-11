@@ -40,7 +40,7 @@ class Calc:
         self.clean_data = self.sort_variables
         # print(self.clean_data)
         # sys.exit()
-        # self.eq = Eq(self.clean_data, prec, frac, verb)
+        self.eq = Eq(self.clean_data)
 
     def get_clean_data(self):
         return self.clean_data

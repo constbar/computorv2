@@ -18,7 +18,8 @@ class Eq:
         # if len(self.data) > 3:
         #     if self.check_high_poly:
         #         self.print_final_result()
-        # self.make_calculations()
+
+        # self.make_calculations() !!! need to reccoment it
         # self.print_final_result()
 
     @property

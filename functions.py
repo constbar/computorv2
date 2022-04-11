@@ -66,9 +66,13 @@ class Function:
         1: 'invalid syntax for function expression',
         2: 'the program doesn\'t process nested brackets',
         3: 'the first part must contain the keyword \'fun\'',
-        4: 'variable function must be the same as in the expression',
-        5: 'unknown variable must not have been initialized before',
-        6: 'the function cannot be opened because it is not in the variables'
+        4: 'function variable must have brackets',
+        5: 'variable function must be the same as in the expression',
+        6: 'unknown variable must be in function brackets',
+        7: 'the function itself must have an equal number of parentheses',
+        8: ''
+        # 5: 'unknown variable must not have been initialized before',
+        # 6: 'the function cannot be opened because it is not in the variables'
     }
 
     REG_WRG_INP_L = r'[a-z]\d'
@@ -76,7 +80,6 @@ class Function:
     REG_PAR_CONT = r'[-+]?(?:(?:\d+\.\d*[a-z]?)|(?:\d+?[a-z]+)|(?:\d+)|(?:[a-z]))'
 
     def __init__(self, inpt):
-        # print(inpt)
         if len(re.findall(Function.REG_WRG_INP_L, inpt)):
             raise FunctionException(Function.F_ERR_D[1])
         self.func_content = self.substitute_parentheses(inpt)
@@ -104,10 +107,8 @@ class Function:
                         temp = '-' + temp.replace('!', '+')
                         repl_par = repl_par.replace(i, temp)
                 repl_par = '+' + repl_par.replace('(','').replace(')','') # re.sub
+                repl_par = Utils.clean_signs(repl_par)
                 repl_par = Function.apply_reduced_form(repl_par)
-        else:
-            repl_par = repl_par.replace('(', '').replace(')', '')
-            repl_par = Function.apply_reduced_form(repl_par)
         return repl_par
 
     @staticmethod

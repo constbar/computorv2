@@ -6,6 +6,7 @@ from termcolor import colored
 from matrices import MatrixException
 from complex_nums import ComplexException
 from handler import HandlerException, Handler
+from functions import FunctionException
 
 # need i colored print here?
 
@@ -48,6 +49,8 @@ class Comp(Cmd):
         except HandlerException as e:
             print(colored(e, 'cyan'))
         except ComplexException as e:
+            print(colored(e, 'cyan'))
+        except FunctionException as e:
             print(colored(e, 'cyan'))
 
         except AttributeError:

@@ -8,6 +8,7 @@ from complex_nums import Complex, ComplexException
 from matrices import Matrix
 from functions import Function, FunctionException
 from utils import Utils
+from calculation import Calc # rename na poly
 
 # case sensetive should be turned off
 # what to do with big I
@@ -43,11 +44,13 @@ class Handler:
     REG_POW_RAT = r'(?:(?:-?\d+\.?\d?))\^[\d+]'
     REG_RAT_POW_BRT = r'\(-?\d+\.?\d+\)\^\d+'
 
+    REG_POLY_EXEC = r'(?:(?:[a-z]+)|(?:-?\d+\.?\d+))\?'
+
     hist = list()
-    # vals = dict()
-    # vals = {'a': 1}
-    vals = {'a': 1, 'func(b)': '2b'}
-    # vals = {'funa': '144+24b^1+1b^2'}
+    vals = dict()
+    # vals = {'a': 1, 'funa(x)':'2*4+x', 'funb(x)': '4-5+(x+2)^2-4'}
+    # vals = {'a': 1, 'func(b)': '2b', 'funca(x)': '-x'}
+    vals = {'funa(x)': '144+24b^1+1b^2', 'z?': '2?'}
     key = None
     val = None
     pre_line = None
@@ -90,18 +93,29 @@ class Handler:
             cls.key, cls.val = cls.pre_line.split('=')
             if cls.key == 'i':
                 raise HandlerException(cls.ERR_DICT[3])
+            elif 'fun' in cls.key:
+                if re.sub(Handler.REG_POLY_EXEC, '', cls.val) == '': 
+                    # print(cls.key, cls.val)
+                    try:
+                        cls.key = cls.vals[cls.key]
+                        cls.val = cls.vals[cls.val][:-1]
+                    except KeyError:
+                        # raise here poly err
+                        pass
+                    cls.handle_polynomial(f'{cls.key}={cls.val}')
+                    sys.exit() # or raise here
+                    sys.exit('MAKE IT CLEAR') # or raise here
             elif re.search(r'\d', cls.key):
-                # if 'fun' in cls.key:
-                #     print('cls.key in ', cls.key)
-
-                # else:
                 raise HandlerException(cls.ERR_DICT[4])
-
-
 
     @classmethod
     def substitute_vals_dict(cls):
-        reg_strd_funcs = r'fun[a-z]+\(.*?\)'
+        """
+        substitution of funcs that are in the dictionary
+        substitution of funcs with parameters that are in the dictionary
+        checking that all functions with parameters are substituted
+        """
+        reg_strd_funcs = r'fun[a-z]+\(.*?\)' # to the top
         reg_func = r'fun[a-z]+\(\d+\.?\d+\)' # with number in
         # print('cls.val   ', cls.val)
 
@@ -113,10 +127,7 @@ class Handler:
             except KeyError:
                 continue
 
-        print('stored vals', cls.vals)
-        print('input      ', cls.val)
-
-
+        # print(cls.val)
         stored_open_funcs = re.findall(reg_func, cls.val)
         for i in sorted(list(set(stored_closed_funcs)), key=len, reverse=True):
             stored_value = i[i.find('(') + 1:i.find(')')]
@@ -126,14 +137,21 @@ class Handler:
                 if s.startswith(look):
                     try:
                         repl = cls.vals[s].replace(stored_letter, f'*{stored_value}')
+                        if repl[0] == '*':
+                            repl = repl[1:]
+                        elif repl.startswith('-*'):
+                            repl = f'{repl[0]}{repl[2:]}'
                         cls.val = cls.val.replace(i, repl)
                     except KeyError:
                         continue
+            cls.val = Utils.clean_signs(cls.val)
+            # print(cls.val)
 
-     !   if re.findall(reg_func, cls.val):
+        if re.findall(reg_func, cls.val):
             raise FunctionException(Function.F_ERR_D[6])
-        print('cls.val    ', cls.val)
-        sys.exit()
+        
+        # print('cls.val    ', cls.val)
+        # sys.exit()
 
         val_list = re.findall(cls.REG_ALWD_SMBLS, cls.val)
         for i in range(len(val_list)):
@@ -143,7 +161,6 @@ class Handler:
                 except KeyError:
                     continue
         cls.res_line = ''.join(val_list)
-
 
 
     @classmethod
@@ -193,37 +210,22 @@ class Handler:
                 cls.val = eval(cls.res_line)
                 cls.prnt_hist_vals()
 
-
-        # print(cls.val)
-        # print(cls.val[:cls.val.find('(')])
-
-        elif len(literal_vals) == 1: # could be just else
-            # print(cls.val)
-            #if it not int or float /cant repalce it
+        elif len(literal_vals) == 1:
+            cls.handle_functions(literal_vals)
+            # replace it to func stuff
             # if not cls.key.startswith('fun'):
             #     raise FunctionException(Function.F_ERR_D[3])
-            # key_var = cls.key[cls.key.find('(') + 1:cls.key.find(')')]
-            # # print(key_var)
-            # if key_var != literal_vals[0]:
+            # elif not '(' in cls.key and not ')' in cls.key:
             #     raise FunctionException(Function.F_ERR_D[4])
-
-            # elif key_var in cls.vals.keys():
+            # key_var = cls.key[cls.key.find('(') + 1:cls.key.find(')')]
+            # if key_var != literal_vals[0]:
             #     raise FunctionException(Function.F_ERR_D[5])
-            # print(literal_vals[0])
-
-            # print(cls.res_line)
-            # sys.exit()
-
-            # if 'fun' in cls.key():
-            cls.res_line = cls.res_line.replace(literal_vals[0], 'x')
-            # print('res      ', cls.res_line)
-
+            # elif key_var in cls.vals.keys():
+            #     raise FunctionException(Function.F_ERR_D[6])
+            # elif cls.res_line.count('(') != cls.res_line.count(')'):
+            #     raise FunctionException(Function.F_ERR_D[7])
             # cls.res_line = cls.res_line.replace(literal_vals[0], 'x')
-            # print(cls.res_line)
-            # cls.handle_functions()
-            # print(cls.val)
-            # sys.exit()
-            cls.handle_functions(literal_vals[0])
+            # cls.handle_functions(literal_vals[0])
 
     @classmethod
     def handle_complex(cls):
@@ -245,12 +247,37 @@ class Handler:
         cls.prnt_hist_vals()
 
     @classmethod
-    def handle_functions(cls, key_var):
-    # def handle_functions(cls):
-        # try eval there
+    def handle_functions(cls, literal_vals):
+        if not cls.key.startswith('fun'):
+            raise FunctionException(Function.F_ERR_D[3])
+        elif not '(' in cls.key and not ')' in cls.key:
+            raise FunctionException(Function.F_ERR_D[4])
+        key_var = cls.key[cls.key.find('(') + 1:cls.key.find(')')]
+        if key_var != literal_vals[0]:
+            raise FunctionException(Function.F_ERR_D[5])
+        elif key_var in cls.vals.keys():
+            raise FunctionException(Function.F_ERR_D[6])
+        elif cls.res_line.count('(') != cls.res_line.count(')'):
+            raise FunctionException(Function.F_ERR_D[7])
+        cls.res_line = cls.res_line.replace(literal_vals[0], 'x')
+
         cls.val = str(Function(Function(cls.res_line).__str__()))
         cls.val = cls.val.replace('x', key_var)
         cls.prnt_hist_vals()
+
+    @classmethod
+    def handle_polynomial(cls, poly):
+        literal_val = list(set(re.findall(r'[a-zA-Z]+', poly)))[0]
+        poly = poly.replace(literal_val, 'x')
+        print(poly)
+        Calc(poly)
+
+        # return back literal val at the begin
+        pass
+
+
+        # cls.key = None
+        # cls.val = None
 
     @classmethod
     def prnt_hist_vals(cls):
@@ -273,14 +300,27 @@ class Handler:
                 cls.vals[cls.key] = str(cls.val)
         cls.hist.append(f'{cls.pre_line.split("=")[0]} -> {cls.val}')
 
-        print(cls.vals)
+        # print(cls.vals)
 
 
+Handler.handle_line('funA(x) = z?')
+# Handler.handle_line('funA(2) + funB(4) = ?')
+# Handler.handle_line('c = funca(10)')
+# Handler.handle_line('func = 2 * (10 + 2x)^2')
+# Handler.handle_line('func(b) = 2 * (10 + 2b)^2')
+# Handler.handle_line('try fucn a + fucn B')  #try it
 
 # unc(b)': '1+1b^1'
 # Handler.handle_line('a = func(x) + func(x)') # good
 # Handler.handle_line('k = func(10) + func(2) + 20') # GOOD
-Handler.handle_line('k = func(10)')
+# Handler.handle_line('funcs(x) = 2 / 10 + 1 * x + 2 + 2x^10')
+# Handler.handle_line('funcs(x) = 2 * 1 + 1 + 22 + 2x')
+# Handler.handle_line('funcs(x) = (2 + x)^5')
+# Handler.handle_line('funcs(x) = -(2 + x)^3') # -x^3 - 6 x^2 - 12 x - 8
+# Handler.handle_line('funcs(x) = -(2 + 3x)^1') # ok
+
+# Handler.handle_line('funcs(x) = func(10) + 2x')
+# Handler.handle_line('funcs(x) = x + 2x')
 
 # Handler.handle_line('c = func(x)')
 # Handler.handle_line('c = func(10) + func(10) + 20')

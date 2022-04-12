@@ -7,20 +7,21 @@ class ComplexException(Exception):
 
 class Complex:
     """
-    REG_WRG_INP_I - checks the input sequence
-    REG_POW_COMPL - searches for all variables within an expression
-    REG_CMPLX_VLS - searches for all variables inside a sign-separated expression
+    REG_WRG_INP_I - check the input sequence
+    REG_POW_COMPL - search for all variables within an expression
+    REG_CMPLX_VLS - search for all variables inside a sign-separated expression
     """
+
+    REG_WRG_INP_I = r'[i]\d'
+    REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[i]\^\d+'
+    REG_CMPLX_VLS = r'(-?\d+\.\d+i|-?\d+i|-?\d*\.\d*|-?\d+|[^ 0-9])'
+
     C_ERR_D = {
         1: 'division by zero',
         2: 'exponent must be an integer',
         3: 'invalid syntax for complex expression'
     }
 
-    REG_WRG_INP_I = r'[i]\d'
-    REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[i]\^\d+'
-    REG_CMPLX_VLS = r'(-?\d+\.\d+i|-?\d+i|-?\d*\.\d*|-?\d+|[^ 0-9])'
-    
     def __init__(self, inpt):
         self.re = 0
         self.im = 0

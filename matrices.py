@@ -7,9 +7,13 @@ class MatrixException(Exception):
 
 class Matrix:
     """
-    REG_POW_MAT - checks if the matrix is raised to the power of the matrix
-    REG_MTRX - finds all matrices in an expression
+    REG_POW_MAT - check if the matrix is raised to the power of the matrix
+    REG_MTRX - find all matrices in an expression
     """
+
+    REG_POW_MAT = r'\]\^-?\['
+    REG_MTRX = r'\[(?:\[(?:-?\d+[.]?[d+]?,?)+\];?)+\]'
+
     M_ERR_D = {
         1: 'matrix could not be empty',
         2: 'the interior parts of the matrix must be equal',
@@ -24,9 +28,6 @@ class Matrix:
         11: 'matrix couldn\'t be an exponent',
         12: 'invalid syntax for matrix expression'
     }
-
-    REG_POW_MAT = r'\]\^-?\['
-    REG_MTRX = r'\[(?:\[(?:-?\d+[.]?[d+]?,?)+\];?)+\]'
 
     def __init__(self, inpt):
         if inpt == '[[]]':

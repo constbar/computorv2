@@ -1,13 +1,12 @@
 import re
 from utils import Utils
-from equation import Eq
 from copy import deepcopy
-from calculation import Calc
 from itertools import product
+from polynomials import Polynomial, PolyCalc
 
 class UnknownVar:
     """
-    special class for variables inside brackets
+    special class for variables inside brackets in functions
     """
     def __init__(self, inpt):
         self.inpt = inpt
@@ -58,10 +57,15 @@ class FunctionException(Exception):
 
 class Function:
     """
-    REG_WRG_INP_L - checks the input sequence
-    REG_IN_PW_PR - finds all expressions in brackets
-    REG_PAR_CONT - finds all variables in given expression
+    REG_WRG_INP_L - check the input sequence
+    REG_IN_PW_PR - find all expressions in brackets
+    REG_PAR_CONT - find all variables in given expression
     """
+
+    REG_WRG_INP_L = r'[a-z]\d'
+    REG_IN_PW_PR = r'\(.*?\)\^\d+'
+    REG_PAR_CONT = r'[-+]?(?:(?:\d+\.\d*[a-z]?)|(?:\d+?[a-z]+)|(?:\d+)|(?:[a-z]))'
+
     F_ERR_D = {
         1: 'invalid syntax for function expression',
         2: 'the program doesn\'t process nested brackets',
@@ -74,10 +78,6 @@ class Function:
         # 5: 'unknown variable must not have been initialized before',
         # 6: 'the function cannot be opened because it is not in the variables'
     }
-
-    REG_WRG_INP_L = r'[a-z]\d'
-    REG_IN_PW_PR = r'\(.*?\)\^\d+'
-    REG_PAR_CONT = r'[-+]?(?:(?:\d+\.\d*[a-z]?)|(?:\d+?[a-z]+)|(?:\d+)|(?:[a-z]))'
 
     def __init__(self, inpt):
         if len(re.findall(Function.REG_WRG_INP_L, inpt)):
@@ -92,8 +92,8 @@ class Function:
         """
         repl_par = function
         par_power_list = list(set(re.findall(Function.REG_IN_PW_PR, function)))
-        if len(par_power_list): # list(set repaats here 2 times
-            for i in sorted(list(set(par_power_list)), key=len, reverse=True):
+        if len(par_power_list):
+            for i in sorted(list(set(par_power_list)), key=len, reverse=True): # del list and set bec repeats
                 if '(' in i[1:]:
                     raise FunctionException(Function.F_ERR_D[2])
                 temp = Function.open_parentheses(i).strip('()')
@@ -106,15 +106,15 @@ class Function:
                         temp = i.strip('-()').replace('-', '!').replace('+', '-')
                         temp = '-' + temp.replace('!', '+')
                         repl_par = repl_par.replace(i, temp)
-                repl_par = '+' + repl_par.replace('(','').replace(')','') # re.sub
+                repl_par = '+' + repl_par.replace('(','').replace(')','')
                 repl_par = Utils.clean_signs(repl_par)
                 repl_par = Function.apply_reduced_form(repl_par)
         return repl_par
 
     @staticmethod
     def apply_reduced_form(piece):
-        piece = Calc(f'{piece}=0').get_clean_data()
-        piece = Eq(piece).get_reduced_form()
+        piece = Polynomial(f'{piece}=0').get_clean_data()
+        piece = PolyCalc(piece).get_reduced_form()
         return piece
 
     @staticmethod

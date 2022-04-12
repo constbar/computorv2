@@ -1,6 +1,3 @@
-import re
-import sys
-
 class Utils:
     @staticmethod
     def clean_signs(raw_str):
@@ -27,4 +24,10 @@ class Utils:
             # return num # . maybe 4 round . format
 
 
-
+    # @staticmethod from poly
+    # def make_sqrt(n, temp=0.0):
+    #     fin_sqrt = n / 2
+    #     while fin_sqrt != temp:
+    #         temp = fin_sqrt
+    #         fin_sqrt = (n / temp + temp) / 2
+    #     return fin_sqrt

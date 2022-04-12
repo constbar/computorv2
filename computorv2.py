@@ -4,11 +4,10 @@ from cmd import Cmd
 from termcolor import colored
 
 from matrices import MatrixException
-from complex_nums import ComplexException
-from handler import HandlerException, Handler
 from functions import FunctionException
-
-# need i colored print here?
+from complex_nums import ComplexException
+from polynomials import PolynomialException
+from handler import HandlerException, Handler
 
 
 class Comp(Cmd):
@@ -38,7 +37,6 @@ class Comp(Cmd):
         else:
             print('list of saved variables is empty')
 
-
     def help_variables(self):
         print('display a list of saved variables and their values')
 
@@ -46,32 +44,28 @@ class Comp(Cmd):
     def default(self, line):
         try:
             Handler.handle_line(line)
-        except HandlerException as e:
-            print(colored(e, 'cyan'))
-        except ComplexException as e:
-            print(colored(e, 'cyan'))
-        except FunctionException as e:
-            print(colored(e, 'cyan'))
 
+        except MatrixException as exc:
+            print(colored(exc, 'cyan'))
+        except HandlerException as exc:
+            print(colored(exc, 'cyan'))
+        except ComplexException as exc:
+            print(colored(exc, 'cyan'))
+        except FunctionException as exc:
+            print(colored(exc, 'cyan'))
+        except PolynomialException as exc:
+            print(colored(exc, 'cyan'))
+
+        except TypeError:
+            print('TypeError')
+        except SyntaxError:
+            print('SyntaxError')
         except AttributeError:
-            # print('attrib error')
             pass
-        # add here syntax err
+            # print('AttributeError')
+        except ZeroDivisionError:
+            print('ZeroDivisionError')
 
-        # except ComplexException as e: # need i?
-        #     print(e)
-        except MatrixException as e: # for static exceptions
-            print(colored(e, 'yellow'))
-        # except TypeError:
-            # print('asd')
-            # FunctionException
-        # except SyntaxError as e:
-        #     print(e)
-        #     print(colored('invalid syntax', 'yellow'))
-        # except ZeroDivisionError
-
-        # except:
-        #     print('olololo invalid syntax in HAndle')
         line = '' # need i?
 
     def emptyline(self):

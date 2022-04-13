@@ -4,6 +4,7 @@ from utils import Utils
 from complex_nums import Complex
 # 109 str -> if big pow -> dont oveflow buffer raise
 # raises here not exits
+# print()a  all ansers intgreen
 
 class PolynomialException(Exception):
     pass
@@ -21,8 +22,8 @@ class Polynomial:
     REG_2_POLY = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX]\^2'
 
     P_ERR_DICT = { #maek ok nmumeration
-        1: '',
-
+        1: 'wrong syntax on the left side of the expression',
+        2: 'wrong syntax on the right side of the expression', 
         3: 'expression must have an integer exponent',
         4: 'expression must have a non-negative exponent',
         5: 'expression can only have allowed syntax',
@@ -193,9 +194,10 @@ class PolyCalc:
             self.prec = max_len_of_input
 
         if self.check_high_poly:
-            raise PolynomialException(PolyCalc.E_RET_DICT[1])
+            raise PolynomialException(f'the polynomial degree', 
+                f'is strictly greater than 2. couldn\'t be solved')
         elif self.pol_dgr == 0:
-            sys.exit('no solution') # wtf??
+            raise PolynomialException('no solution')
         
         if self.disc is not None and self.disc != 0:
             print('there are two solutions:')

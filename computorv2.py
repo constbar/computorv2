@@ -66,8 +66,6 @@ class Comp(Cmd):
         except ZeroDivisionError:
             print('ZeroDivisionError')
 
-        line = '' # need i?
-
     def emptyline(self):
         pass
 

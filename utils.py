@@ -19,6 +19,7 @@ class Utils:
         if num % 1 == 0:
             return int(f'{num:.{0}f}')
         else:
+            return round(num, 4)
             return f'{round(num, 4)}'
             # return f'{num:.{4}f}'
             # return num # . maybe 4 round . format

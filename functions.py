@@ -4,7 +4,7 @@ from copy import deepcopy
 from itertools import product
 from polynomials import Polynomial, PolyCalc
 
-class UnknownVar:
+class BracketVariable:
     """
     special class for variables inside brackets in functions
     """
@@ -87,8 +87,8 @@ class Function:
     @staticmethod
     def substitute_parentheses(function):
         """
-        opens brackets in expression and outputs raw entry
-        also correctly opens parentheses if the minus sign precedes the parentheses
+        open brackets in expression and outputs raw entry
+        also correctly open parentheses if the minus sign precedes the parentheses
         """
         repl_par = function
         par_power_list = list(set(re.findall(Function.REG_IN_PW_PR, function)))
@@ -126,7 +126,7 @@ class Function:
             prod = list(product(fin, literal_vals))
             fin = []
             for part in prod:
-                part = '*'.join([f"UnknownVar('{p}')" for p in part])
+                part = '*'.join([f"BracketVariable('{p}')" for p in part])
                 fin.append(eval(part))
 
         final_output = ''
@@ -135,9 +135,9 @@ class Function:
                 final_output += fin[i].__str__()
             else:
                 final_output += fin[i].__str__() + '+'
-
-        final_output = '(' + Utils.clean_signs(final_output) + ')'
-        return final_output
+        return f'({Utils.clean_signs(final_output)})' # test it
+        # final_output = '(' + Utils.clean_signs(final_output) + ')'
+        # return final_output
 
     def __add__(self, other):
         final_result = f'{self.func_content}+{other.func_content}'

@@ -13,8 +13,10 @@ from complex_nums import Complex, ComplexException
 class HandlerException(Exception):
     pass
 
-# if ** in line break it
 # check complex + complex from dictionareis
+# isinstance(cls.val[:-1], (int, float))
+# make chmod ok
+# split files to files
 
 class Handler:
     """
@@ -45,12 +47,6 @@ class Handler:
 
     hist = list()
     vals = dict()
-    # vals = {'a': 1, 'funa(x)':'2*4+x', 'funb(x)': '4-5+(x+2)^2-4'}
-    # vals = {'a': 1, 'func(b)': '2b', 'funca(x)': '-x'}
-    # vals = {'funa(x)': '144+24b^1+1b^2', 'z?': '2?'}
-    # vals = {'funa(x)': '2x^2 + 2x + 4', 'z': '2'}
-    # vals = {'funa(x)': '2x', 'z?': '2?'}
-
     key = None
     val = None
     pre_line = None
@@ -104,10 +100,20 @@ class Handler:
                 if re.sub(Handler.REG_POLY_EXEC, '', cls.val) == '': 
                     try:
                         cls.key = cls.vals[cls.key]
-                        cls.val = cls.vals[cls.val[:-1]]
                     except KeyError:
-                        # raise here poly err
+                        raise PolynomialException(Polynomial.P_ERR_DICT[1])
+                    is_num = False
+                    try:
+                        float(cls.val[:-1])
+                        cls.val = cls.val[:-1]
+                        is_num = True
+                    except ValueError:
                         pass
+                    if not is_num:
+                        try:
+                            cls.val = cls.vals[cls.val[:-1]]
+                        except KeyError:
+                            raise PolynomialException(Polynomial.P_ERR_DICT[2])
                     cls.handle_polynomial(f'{cls.key}={cls.val}')
             elif re.search(r'\d', cls.key):
                 raise HandlerException(cls.H_ERR_DICT[4])
@@ -183,12 +189,14 @@ class Handler:
             temp = i
             temp = eval(temp.replace('^', '**'))
             cls.res_line = cls.res_line.replace(i, '+' + str(temp))
+        cls.res_line = Utils.clean_signs(cls.res_line)
 
         rat_pow_brt_list = re.findall(Handler.REG_POW_RAT_BRT, cls.res_line)
         for i in sorted(list(set(rat_pow_brt_list)), key=len, reverse=True):
             temp = i
             temp = eval(temp.replace('^', '**'))
             cls.res_line = cls.res_line.replace(i, '+' + str(temp))
+        cls.res_line = Utils.clean_signs(cls.res_line)
 
     @classmethod
     def handle_expression(cls):
@@ -199,7 +207,6 @@ class Handler:
             is_complex = True
         except ValueError:
             pass
-
         if len(literal_vals) > 1:
             raise HandlerException(cls.H_ERR_DICT[99])
         elif len(literal_vals) == 0 and is_complex:
@@ -208,7 +215,7 @@ class Handler:
             if '[[' in cls.res_line:
                 cls.handle_matrices()
             else:
-                cls.val = eval(cls.res_line)
+                cls.val = Utils.try_int(eval(cls.res_line))
                 cls.prnt_hist_vals()
         elif len(literal_vals) == 1:
             cls.handle_functions(literal_vals)
@@ -256,7 +263,7 @@ class Handler:
         poly = poly.replace(literal_val, 'x')
         print(poly.replace(' ', ''))
         Polynomial(poly, print_answer=True)
-        # raise
+        raise
 
     @classmethod
     def prnt_hist_vals(cls):
@@ -281,5 +288,13 @@ class Handler:
         # print(cls.vals)
 
 # poly doesnt work
+
+# Handler.handle_line('func(x)=c?')
+# Handler.handle_line('func(x)=14?')
+
 # Handler.handle_line('funA(x) = z?')
 # Handler.handle_line('x+x= 2') # poly x = 0 # ne reshaetsya
+
+
+# print('12.2'.isnumeric())
+# Handler.handle_line("func(x) = 123123123x  - 2^3") #  good

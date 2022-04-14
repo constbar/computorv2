@@ -25,7 +25,7 @@ class Utils:
             # return num # . maybe 4 round . format
 
 
-    # @staticmethod from poly
+    # @staticmethod from poly # maybe can be useful 
     # def make_sqrt(n, temp=0.0):
     #     fin_sqrt = n / 2
     #     while fin_sqrt != temp:

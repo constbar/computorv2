@@ -2,9 +2,12 @@ import re
 import sys # delete it
 from utils import Utils
 from complex_nums import Complex
+
 # 109 str -> if big pow -> dont oveflow buffer raise
 # raises here not exits
 # print()a  all ansers intgreen
+# > 0 + x + 1 + 2x + 123=? # doessnt work
+
 
 class PolynomialException(Exception):
     pass
@@ -250,3 +253,5 @@ class PolyCalc:
             self.results.append(find_complex_solutions('-'))
         else:
             self.print_final_result()
+
+

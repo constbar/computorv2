@@ -35,7 +35,7 @@ class Handler:
     REG_POW_RAT_BRT = r'\(-?\d+\.?\d+\)\^\d+'
     REG_POLY_EXEC = r'(?:(?:[a-z]+)|(?:-?\d+\.?\d+))\?'
 
-    H_ERR_DICT = { # H_ERR_DICT
+    H_ERR_DICT = {
         1: 'expression should have one equal sign',
         2: 'both sides of the expression must be',
         3: '\'i\' can\'t be used for variables',
@@ -43,6 +43,7 @@ class Handler:
         33: 'expression must have an integer exponent',
         44: 'expression must have a non-negative exponent',
         99: 'too many unknown vars for expression',
+        77: 'variable should have allowed syntax'
     }
 
     hist = list()
@@ -215,6 +216,9 @@ class Handler:
             if '[[' in cls.res_line:
                 cls.handle_matrices()
             else:
+                if '(' in cls.key or ')' in cls.key:
+                    if not cls.key.count('(') == cls.key.count(')'):
+                        raise HandlerException(cls.H_ERR_DICT[77])
                 cls.val = Utils.try_int(eval(cls.res_line))
                 cls.prnt_hist_vals()
         elif len(literal_vals) == 1:
@@ -244,7 +248,7 @@ class Handler:
         if not cls.key.startswith('fun'):
             raise FunctionException(Function.F_ERR_D[3])
         elif not '(' in cls.key and not ')' in cls.key:
-            raise FunctionException(Function.F_ERR_D[4])
+            raise FunctionException(Function.F_ERR_D[4]) #
         key_var = cls.key[cls.key.find('(') + 1:cls.key.find(')')]
         if key_var != literal_vals[0]:
             raise FunctionException(Function.F_ERR_D[5])

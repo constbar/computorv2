@@ -109,6 +109,15 @@ class Function:
                 repl_par = '+' + repl_par.replace('(','').replace(')','')
                 repl_par = Utils.clean_signs(repl_par)
                 repl_par = Function.apply_reduced_form(repl_par)
+        else:
+! make it ok             # try:
+            print(repl_par)
+            repl_par = (Function.apply_reduced_form(repl_par))
+            print(repl_par)
+            exit()
+            # print(keke)
+            # except:
+            #     print('why??')
         return repl_par
 
     @staticmethod

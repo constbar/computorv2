@@ -68,7 +68,7 @@ class Function:
 
     F_ERR_D = {
         1: 'invalid syntax for function expression',
-        2: 'the program doesn\'t process nested brackets',
+        2: 'the program doesn\'t process nested brackets in functions',
         3: 'the first part must contain the keyword \'fun\'',
         4: 'function variable must have brackets',
         5: 'variable function must be the same as in the expression',
@@ -110,14 +110,10 @@ class Function:
                 repl_par = Utils.clean_signs(repl_par)
                 repl_par = Function.apply_reduced_form(repl_par)
         else:
-! make it ok             # try:
-            print(repl_par)
-            repl_par = (Function.apply_reduced_form(repl_par))
-            print(repl_par)
-            exit()
-            # print(keke)
-            # except:
-            #     print('why??')
+            try:
+                repl_par = Function.apply_reduced_form(repl_par)
+            except:
+                pass
         return repl_par
 
     @staticmethod

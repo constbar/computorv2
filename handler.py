@@ -5,9 +5,9 @@ import sys # delete it
 from utils import Utils
 from matrices import Matrix
 from termcolor import colored
-from polynomials import Polynomial
 from functions import Function, FunctionException
 from complex_nums import Complex, ComplexException
+from polynomials import Polynomial, PolynomialException
 
 
 class HandlerException(Exception):
@@ -35,6 +35,15 @@ class Handler:
     REG_POW_RAT_BRT = r'\(-?\d+\.?\d+\)\^\d+'
     REG_POLY_EXEC = r'(?:(?:[a-z]+)|(?:-?\d+\.?\d+))\?'
 
+    REG_ABS = r'abs\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REG_COS = r'cos\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REG_SIN = r'sin\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REG_TAN = r'tan\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REG_ATAN = r'atan\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REG_RAD = r'rad\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+
+    REG_MATH = [REG_ABS, REG_SIN, REG_COS, REG_ATAN, REG_TAN, REG_RAD]
+
     H_ERR_DICT = {
         1: 'expression should have one equal sign',
         2: 'both sides of the expression must be',
@@ -58,10 +67,35 @@ class Handler:
     def handle_line(cls, input_line):
         cls.null_variables()
         cls.read_expression(input_line)
+
+        # remove it then
+        cls.substitute_math_formulas()
+
         cls.substitute_vals_dict()
         cls.check_exponent()
         cls.exponentiation_rationals()
+
+
         cls.handle_expression()
+
+
+    @classmethod
+    def substitute_math_formulas(cls):
+        print(cls.val)
+        formulas_list = [Utils.make_abs, Utils.make_sin, Utils.make_cos, 
+            Utils.make_atan, Utils.make_tan, Utils.make_radians]
+        formulas_regs = list(zip(formulas_list, cls.REG_MATH))
+
+        for form, reg in formulas_regs:
+            match_list = re.findall(reg, cls.val)
+            for repl in sorted(list(set(match_list)), key=len, reverse=True):
+                cleared_value = repl[repl.find('(') + 1: repl.find(')')]
+                cls.val = cls.val.replace(repl, str(form(float(cleared_value))))
+            
+        cls.val = Utils.clean_signs(cls.val)
+        
+        # make modulas for matirux and complex
+
 
     @classmethod
     def null_variables(cls):
@@ -97,27 +131,31 @@ class Handler:
             cls.key, cls.val = cls.pre_line.split('=')
             if cls.key == 'i':
                 raise HandlerException(cls.H_ERR_DICT[3])
-            elif 'fun' in cls.key: # doesnt wotj if num =?
+            elif 'fun' in cls.key:
                 if re.sub(Handler.REG_POLY_EXEC, '', cls.val) == '': 
-                    try:
-                        cls.key = cls.vals[cls.key]
-                    except KeyError:
-                        raise PolynomialException(Polynomial.P_ERR_DICT[1])
-                    is_num = False
-                    try:
-                        float(cls.val[:-1])
-                        cls.val = cls.val[:-1]
-                        is_num = True
-                    except ValueError:
-                        pass
-                    if not is_num:
-                        try:
-                            cls.val = cls.vals[cls.val[:-1]]
-                        except KeyError:
-                            raise PolynomialException(Polynomial.P_ERR_DICT[2])
+                    cls.prepare_polynomial_key_val()
                     cls.handle_polynomial(f'{cls.key}={cls.val}')
             elif re.search(r'\d', cls.key):
                 raise HandlerException(cls.H_ERR_DICT[4])
+
+    @classmethod
+    def prepare_polynomial_key_val(cls):
+        try:
+            cls.key = cls.vals[cls.key]
+        except KeyError:
+            raise PolynomialException(Polynomial.P_ERR_DICT[1])
+        is_num = False
+        try:
+            float(cls.val[:-1])
+            cls.val = cls.val[:-1]
+            is_num = True
+        except ValueError:
+            pass
+        if not is_num:
+            try:
+                cls.val = cls.vals[cls.val[:-1]]
+            except KeyError:
+                raise PolynomialException(Polynomial.P_ERR_DICT[2])
 
     @classmethod
     def substitute_vals_dict(cls):
@@ -137,7 +175,7 @@ class Handler:
             except KeyError:
                 continue
 
-        # print(cls.val)
+        # print('before raspr', cls.val)
         stored_open_funcs = re.findall(reg_func, cls.val)
         for i in sorted(list(set(stored_closed_funcs)), key=len, reverse=True):
             stored_value = i[i.find('(') + 1:i.find(')')]
@@ -190,14 +228,18 @@ class Handler:
             temp = i
             temp = eval(temp.replace('^', '**'))
             cls.res_line = cls.res_line.replace(i, '+' + str(temp))
+        # print('1', cls.res_line)
         cls.res_line = Utils.clean_signs(cls.res_line)
+        # print('1', cls.res_line)
 
         rat_pow_brt_list = re.findall(Handler.REG_POW_RAT_BRT, cls.res_line)
         for i in sorted(list(set(rat_pow_brt_list)), key=len, reverse=True):
             temp = i
             temp = eval(temp.replace('^', '**'))
             cls.res_line = cls.res_line.replace(i, '+' + str(temp))
+        # print('2', cls.res_line)
         cls.res_line = Utils.clean_signs(cls.res_line)
+        # print('2', cls.res_line)
 
     @classmethod
     def handle_expression(cls):
@@ -216,7 +258,7 @@ class Handler:
             if '[[' in cls.res_line:
                 cls.handle_matrices()
             else:
-                if '(' in cls.key or ')' in cls.key:
+                if '(' in str(cls.key) or ')' in str(cls.key):
                     if not cls.key.count('(') == cls.key.count(')'):
                         raise HandlerException(cls.H_ERR_DICT[77])
                 cls.val = Utils.try_int(eval(cls.res_line))
@@ -289,10 +331,13 @@ class Handler:
                 cls.vals[cls.key] = str(cls.val)
         cls.hist.append(f'{cls.pre_line.split("=")[0]} -> {cls.val}')
 
-        # print(cls.vals)
+        # print('slovar', cls.vals)
 
 # poly doesnt work
 
+Handler.handle_line('cos(0) =?')
+# Handler.handle_line('x = cos(122) + atan(22) + abs(-2) + sin(-3) - tan(2) + rad(2)')
+# Handler.handle_line('1+2=?') good
 # Handler.handle_line('func(x)=c?')
 # Handler.handle_line('func(x)=14?')
 

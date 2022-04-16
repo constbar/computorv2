@@ -1,41 +1,21 @@
-import os
-import sys
-
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
-from handler import Handler
-hndl = Handler.handle_line
-
-
-# rationals tests
-# hndl('exp = "" ') # thru running script will be ok 
-# hndl('exp = --2')
-# hndl('exp = 42.')
-# hndl('exp = +4')
-# hndl('exp = asd')
-# hndl('exp = 5 = ?')
-# hndl('func(x) = asd')
-# hndl('exp = 22e-+dd5-+')
-# hndl('exp = 20 + 390')
-# hndl('exp = (-12.2)^2 + (12.2)^2')
-	
-# hndl('exp = 3 + 5 ?') # strange thing
-# hndl('x + 8 = 5')
-# hndl('x = 10 / 0')
-#     {'input': 'x / 0 = ?',)
-#     {'input': 'x / 0 ?', )
-#     {'input': 'i = 8', )
-# hndl('exp = env') # what is?
+test_1 = [
+	'b = (-12.2)^2 + (12.2)^2', 'a = 20 + 390',
+	'', 'e = 2 + (3 * 5) + 1', 'a = --2', 'b = 42.', 'c = +4', 'a = b',
+	'a = 21', 'a = 1 + 2', 'b = 7 - 2', 'c = 5 % 2', 'd = 4 * 2', 'c = a']
 
 
 
-# errors
-# hndl('exp = x == 5')
-# hndl('x == 5')
-# hndl('desc')
-# hndl('= 2')
-# hndl('funX(x = 2')
-# hndl('funXx) = 2')
+test_errors = [
+	'exp = x == 5', 'x == 5', 'qwertyqwertyqwerty', '= 2', 'funX(x = 2', 'funXx) = 2', 
+	's = [4,4]]', 's = 4(', 's = 4)', 's = 4()', '(.)', 's = (4', 's = )4', 's = ()4',
+	'1 + 4(2+3)', '2 * &', 'i = 3', 'a = 1 + 4(2+3)' 'x = 10 / 0', 's = 4x3', 's = x4', 
+	'm = [[[1,2];[2,1]];[[1,2];[2,1]]]', '[[1,2];[2,1]];[[1,2];[2,1]]', 'dshjf i dshjf', 
+	's = ', ' = 4', '3 = 4', 's = y', 's = f(x)', 'f( = 4', 'f) = 4', 'f(x = 4)', 'f(=)',
+	'exp = 5 = ?', 'func(x) = asd', 'exp = 22e-+dd5-+', 'v8 = 2', 'i osdfg gfj', 's = 4x',
+	's = ,4', 's = ;4', 's = 4[', 's = 4[]', 's = 4]', '[;]', '[1;]', '[;1]', 's = [[4,4]',
+	'[1,2] + 2 = 2 ?', 'sfhjsre srehj regjl', 'sfhjsre srehji regjl', 'x / 0 = ?', 'x == 4',
+	'x / 0 ?', 'i = 8', 's = 4-', '4+', '4*', '4/', '4%', '4^', '*4', '/4', '%4', '^4', '+4-',
+	's = 4--2', '2++3', '3+-4', '4+-5', '4*^5', '4%/5', 'y = 4?', 's = 4,', 's = 4;', 's = ?4']
 
-# matrix !!!!!!!!!!!!
-# hndl('exp = [[4,4];[2,2]')
+
+rationals_tests = test_1 + test_errors

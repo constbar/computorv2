@@ -58,6 +58,8 @@ class Comp(Cmd):
 
         except TypeError:
             print('TypeError')
+        except ValueError:
+            print('ValueError')
         except SyntaxError:
             print('SyntaxError')
         except AttributeError:
@@ -65,6 +67,7 @@ class Comp(Cmd):
             # print('AttributeError')
         except ZeroDivisionError:
             print('ZeroDivisionError')
+        # add all expcetinon 
 
     def emptyline(self):
         pass

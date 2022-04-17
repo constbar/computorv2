@@ -25,16 +25,16 @@ class Polynomial:
         3: 'expression must have an integer exponent',
         4: 'expression must have a non-negative exponent',
         5: 'expression can only have allowed syntax',
-        6: 'it\'s just a numerical equation. no solution',
-        7: 'it\'s an incorrect numerical equation. no solution',
+        6: 'it is just a numerical equation. no solution',
+        7: 'it is an incorrect numerical equation. no solution',
         8: 'each real number is a solution',
     }
 
     def __init__(self, equation, print_answer=False):
         self.orig = equation
         self.cin = self.cut_input
-        self.check_errors()
         self.clean_data = self.sort_variables
+        self.check_errors()
         self.eq = PolyCalc(self.clean_data, print_answer)
 
     def get_clean_data(self):
@@ -176,10 +176,16 @@ class PolyCalc:
                     else:
                         red_form += f'{Utils.try_int(self.data[i])}x+'
                 else:
-                    red_form += f'{Utils.try_int(self.data[i])}x^{i}+'
+                    if self.data[i] == 1:
+                        red_form += f'x^{i}+'
+                    elif self.data[i] == -1:
+                        red_form += f'-x^{i}+'
+                    else:
+                        red_form += f'{Utils.try_int(self.data[i])}x^{i}+'
         red_form = red_form.replace('+-', ' - ').replace('+', ' + ')
         red_form = '- ' + red_form[1:] if red_form[0] == '-' else red_form
-        return red_form[:-2].replace(' ', '').replace('x^0', '')
+        red_form = red_form[:-2].replace(' ', '').replace('x^0', '')
+        return '1' if not red_form else red_form
 
     def print_final_result(self):
         max_len_of_input = max(map(len, map(str, map(int, (self.data.values())))))
@@ -188,7 +194,7 @@ class PolyCalc:
 
         if self.check_high_poly:
             raise PolynomialException(f'the polynomial degree is strictly ',
-                                      f'greater than 2. couldn\'t be solved')
+                                      f'greater than 2. could not be solved')
         elif self.pol_dgr == 0:
             raise PolynomialException('no solution')
 

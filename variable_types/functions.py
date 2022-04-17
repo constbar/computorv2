@@ -19,12 +19,12 @@ class BracketVariable:
             self.factor = float(inpt)
             self.power = 0
         else:
-            self.value = self.clean_inpt
+            self.value = self.clean_input
             self.factor = self.get_factor
             self.power = self.get_power
 
     @property
-    def clean_inpt(self):
+    def clean_input(self):
         return self.inpt.replace('*', '')
 
     @property
@@ -71,7 +71,7 @@ class Function:
 
     F_ERR_D = {
         1: 'invalid syntax for function expression',
-        2: 'the program doesn\'t process nested brackets in functions',
+        2: 'the program does not process nested brackets in functions',
         3: 'the first part must contain the keyword \'fun\'',
         4: 'function variable must have brackets',
         5: 'variable function must be the same as in the expression',

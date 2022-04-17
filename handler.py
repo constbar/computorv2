@@ -44,7 +44,7 @@ class Handler:
     H_ERR_DICT = {
         1: 'expression should have one equal sign',
         2: 'both sides of the expression must be',
-        3: '\'i\' can\'t be used for variables',
+        3: '\'i\' can not be used for variables',
         4: 'variables should only contain letters',
         5: 'expression must have an integer exponent',
         6: 'expression must have a non-negative exponent',
@@ -54,7 +54,6 @@ class Handler:
 
     hist = list()
     vals = dict()
-    vals = {'func(x)': '2x'}
     key = None
     val = None
     pre_line = None
@@ -123,7 +122,6 @@ class Handler:
         formulas_regs = list(zip(formulas_list, cls.REG_MATH))
 
         for form, reg in formulas_regs:
-            # match_list = re.findall(reg, cls.val)
             match_list = list(map(str, re.findall(reg, cls.val)))
             for repl in sorted(list(set(match_list)), key=len, reverse=True):
                 cleared_value = repl[repl.find('(') + 1: repl.find(')')]
@@ -132,7 +130,6 @@ class Handler:
 
         if 'mod' in cls.val:
             mod_list = re.findall(cls.REG_MOD, cls.val)
-            # mod_list = list(map(str(re.findall(cls.REG_MOD, cls.val))))
             for repl in sorted(list(set(mod_list)), key=len, reverse=True):
                 cleared_value = repl[str(repl).find('(') + 1: str(repl).find(')')]
                 if '[' not in repl:
@@ -173,21 +170,15 @@ class Handler:
         substitution of funcs with parameters that are in the dictionary
         checking that all functions with parameters are substituted
         """
-
-        print('1cls.val   ', cls.val)
-
         stored_closed_funcs = re.findall(cls.REG_CLSD_FUNC, cls.val)
         for i in sorted(list(set(stored_closed_funcs)), key=len, reverse=True):
             try:
                 cls.val = cls.val.replace(i, cls.vals[i])
             except KeyError:
                 continue
-        print('2cls.val   ', cls.val)
 
-        # print('before raspr', cls.val)
         stored_open_funcs = re.findall(cls.REG_OPEN_FUNC, cls.val)
-        for i in sorted(list(set(stored_closed_funcs)), key=len, reverse=True):
-        # for i in sorted(list(set(stored_open_funcs)), key=len, reverse=True):
+        for i in sorted(list(set(stored_open_funcs)), key=len, reverse=True):
             stored_value = i[str(i).find('(') + 1: str(i).find(')')]
             look = i[:str(i).find('(') + 1]
             for s in cls.vals.keys():
@@ -203,16 +194,10 @@ class Handler:
                     except KeyError:
                         continue
             cls.val = Utils.clean_signs(cls.val)
-            print(cls.val)
-
-        print('3cls.val   ', cls.val)
 
         if re.findall(cls.REG_OPEN_FUNC, cls.val):
             raise FunctionException(Function.F_ERR_D[6])
         
-        # print('cls.val    ', cls.val)
-        # sys.exit()
-
         val_list = re.findall(cls.REG_DCT_VLS, cls.val)
         for i in range(len(val_list)):
             if val_list[i].isalpha():
@@ -233,25 +218,21 @@ class Handler:
     def exponentiation_rationals(cls):
         """
         replacing all rational exponents without brackets
-        replacing all rational exponents with brackets
+        replacing all rational exponents with brackets inside func
         """
         rat_pow_list = re.findall(Handler.REG_POW_RAT, cls.res_line)
         for i in sorted(list(set(rat_pow_list)), key=len, reverse=True):
             temp = i
             temp = eval(str(temp).replace('^', '**'))
             cls.res_line = cls.res_line.replace(i, '+' + str(temp))
-        # print('1', cls.res_line)
         cls.res_line = Utils.clean_signs(cls.res_line)
-        # print('1', cls.res_line)
 
         rat_pow_brt_list = re.findall(Handler.REG_POW_RAT_BRT, cls.res_line)
         for i in sorted(list(set(rat_pow_brt_list)), key=len, reverse=True):
             temp = i
             temp = eval(str(temp).replace('^', '**'))
             cls.res_line = cls.res_line.replace(i, '+' + str(temp))
-        # print('2', cls.res_line)
         cls.res_line = Utils.clean_signs(cls.res_line)
-        # print('2', cls.res_line)
 
     @classmethod
     def handle_expression(cls):

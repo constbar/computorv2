@@ -21,13 +21,13 @@ class Matrix:
         2: 'the interior parts of the matrix must be equal',
         3: 'invalid matrix content',
         4: 'both matrices must be the same size',
-        5: 'matrices must be equal for termwise multiplication',
+        5: 'matrices must be equal for element-wise multiplication',
         6: 'the columns of the first matrix must be equal to the rows of the second',
         7: 'the degree of the matrix must be an integer',
         8: 'matrix must be square',
         9: 'matrix power must be greater than 0',
         10: 'the determinant is 0. there is no unique solution',
-        11: 'matrix couldn\'t be an exponent',
+        11: 'matrix could not be an exponent',
         12: 'invalid syntax for matrix expression'
     }
 
@@ -117,7 +117,7 @@ class Matrix:
             self.matrix_content = ret_matrix
 
             if self.inversed or other.inversed:
-                self.matrix_content = self.round_elems_matrix(self.matrix_content, 0)
+                self.matrix_content = self.round_matrix_elements(self.matrix_content, 0)
                 self.inversed = False
             self.recalculate_matrix()
             return self
@@ -181,7 +181,7 @@ class Matrix:
         return rotated
 
     @staticmethod
-    def round_elems_matrix(m_list, precision=4):
+    def round_matrix_elements(m_list, precision=4):
         for row in range(len(m_list)):
             for col in range(len(m_list)):
                 m_list[row][col] = round(m_list[row][col], precision)
@@ -236,7 +236,7 @@ class Matrix:
                     cofactors[row][col] = cofactors[row][col] / determinant
             matrix_class.matrix_content = cofactors
 
-        matrix_class.matrix_content = Matrix.round_elems_matrix(matrix_class.matrix_content)        
+        matrix_class.matrix_content = Matrix.round_matrix_elements(matrix_class.matrix_content)
         matrix_class.inversed = True
         matrix_class.recalculate_matrix()
         return matrix_class

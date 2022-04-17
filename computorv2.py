@@ -12,14 +12,14 @@ from variable_types.polynomials import PolynomialException
 class Comp(Cmd):
     prompt = '> '
 
-    def do_exit(self, param):
+    def do_exit(self, _):
         print('program closure')
         return True
     
     def help_exit(self):
         print('exit from the program. ctrl-d or \'exit\'')
 
-    def do_history(self, param):
+    def do_history(self, _):
         if Handler.hist:
             for i in Handler.hist:
                 print(i)
@@ -29,7 +29,7 @@ class Comp(Cmd):
     def help_history(self):
         print('show command history with results')
 
-    def do_variables(self, param):
+    def do_variables(self, _):
         if Handler.vals.keys():
             for k, v in Handler.vals.items():
                 print(k, ': ', v, sep='')
@@ -58,14 +58,6 @@ class Comp(Cmd):
             pass
         except Exception:
             print(colored('invalid syntax', 'cyan'))
-            
-        # except TypeError:
-        #     print('TypeError')
-        # except ValueError:
-        #     print('ValueError')
-        # except SyntaxError:
-        #     print('SyntaxError')
-        # add all expcetinon 
 
     def emptyline(self):
         pass

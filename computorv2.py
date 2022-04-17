@@ -2,12 +2,11 @@
 
 from cmd import Cmd
 from termcolor import colored
-
-from matrices import MatrixException
-from functions import FunctionException
-from complex_nums import ComplexException
-from polynomials import PolynomialException
 from handler import HandlerException, Handler
+from variable_types.matrices import MatrixException
+from variable_types.functions import FunctionException
+from variable_types.complex_nums import ComplexException
+from variable_types.polynomials import PolynomialException
 
 
 class Comp(Cmd):
@@ -40,33 +39,32 @@ class Comp(Cmd):
     def help_variables(self):
         print('display a list of saved variables and their values')
 
-
     def default(self, line):
         try:
             Handler.handle_line(line)
-
         except MatrixException as exc:
-            print(colored(exc, 'cyan'))
+            print(colored(str(exc), 'cyan'))
         except HandlerException as exc:
-            print(colored(exc, 'cyan'))
+            print(colored(str(exc), 'cyan'))
         except ComplexException as exc:
-            print(colored(exc, 'cyan'))
+            print(colored(str(exc), 'cyan'))
         except FunctionException as exc:
-            print(colored(exc, 'cyan'))
+            print(colored(str(exc), 'cyan'))
         except PolynomialException as exc:
-            print(colored(exc, 'cyan'))
-
-        except TypeError:
-            print('TypeError')
-        except ValueError:
-            print('ValueError')
-        except SyntaxError:
-            print('SyntaxError')
+            print(colored(str(exc), 'cyan'))
+        except ZeroDivisionError:
+            print(colored('division by zero is not allowed', 'cyan'))
         except AttributeError:
             pass
-            # print('AttributeError')
-        except ZeroDivisionError:
-            print('ZeroDivisionError')
+        except Exception:
+            print(colored('invalid syntax', 'cyan'))
+            
+        # except TypeError:
+        #     print('TypeError')
+        # except ValueError:
+        #     print('ValueError')
+        # except SyntaxError:
+        #     print('SyntaxError')
         # add all expcetinon 
 
     def emptyline(self):
@@ -74,6 +72,7 @@ class Comp(Cmd):
 
     do_EOF = do_exit
     help_EOF = help_exit
- 
+
+
 if __name__ == '__main__':
     Comp().cmdloop()

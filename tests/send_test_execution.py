@@ -1,14 +1,12 @@
+#!/usr/bin/python3
+
 import zmq
-
-
-from termcolor import colored
-from random import randint
-
-
 import matrices_tests
 import functions_tests
 import complex_nums_tests
+from random import randint
 import rationals_syntax_tests
+from termcolor import colored
 
 if __name__ == '__main__':
     import sys
@@ -48,5 +46,5 @@ if __name__ == '__main__':
         else:
             socket.send(f'exp = {tests[r]}'.encode())
         message = socket.recv()
-        print('sended:', colored(tests[r], 'green'))
+        print('sent:', colored(tests[r], 'green'))
         

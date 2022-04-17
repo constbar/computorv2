@@ -1,9 +1,11 @@
 import re
-from utils import Utils
 from copy import deepcopy
+from variable_types.utils import Utils
+
 
 class MatrixException(Exception):
     pass
+
 
 class Matrix:
     """
@@ -12,7 +14,7 @@ class Matrix:
     """
 
     REG_POW_MAT = r'\]\^-?\['
-    REG_MTRX = r'\[(?:\[(?:-?\d+[.]?[d+]?,?)+\];?)+\]'
+    REG_MATRIX = r'\[(?:\[(?:-?\d+[.]?[d+]?,?)+\];?)+\]'
 
     M_ERR_D = {
         1: 'matrix could not be empty',
@@ -75,8 +77,8 @@ class Matrix:
             self.matrix_content[row] = list(map(sum, self.matrix_content[row]))
         return self
 
-    def __mul__(self, other): # input can be int float or other what about Any?
-        if isinstance(other, int) or isinstance(other, float):
+    def __mul__(self, other):
+        if isinstance(other, (int, float)):
             return self.__rmul__(other)
         elif type(self) == type(other):
             if self.rows == other.rows and self.cols == other.cols:
@@ -89,7 +91,7 @@ class Matrix:
         return self
 
     def __rmul__(self, other):
-        if isinstance(other, int) or isinstance(other, float):
+        if isinstance(other, (int, float)):
             for row in range(self.rows):
                 for col in range(self.cols):
                     self.matrix_content[row][col] *= other
@@ -154,7 +156,7 @@ class Matrix:
             return_str += str(list(map(Utils.try_int, self.matrix_content[i])))
             if i != len(self.matrix_content) - 1:
                 return_str += '\n'
-        return return_str.replace(' ','')
+        return return_str.replace(' ', '')
 
     def recalculate_matrix(self):
         self.rows = len(self.matrix_content)
@@ -195,7 +197,6 @@ class Matrix:
         cols_len = len(matrix_list[0])
         if rows_len != cols_len:
             raise MatrixException(Matrix.M_ERR_D[8])
-            # what if r and c == 0 ?? test it
         elif rows_len == 1:
             return matrix_list[0][0]
         elif rows_len == 2:
@@ -218,9 +219,9 @@ class Matrix:
             matrix_class.matrix_content[0][0] = 1 / matrix_class.matrix_content[0][0]
         elif matrix_class.rows == 2:
             matrix_class.matrix_content = [[matrix_class.matrix_content[1][1] / determinant,
-                                -1 * matrix_class.matrix_content[0][1] / determinant],
-                               [-1 * matrix_class.matrix_content[1][0] / determinant,
-                                matrix_class.matrix_content[0][0] / determinant]]
+                                            -1 * matrix_class.matrix_content[0][1] / determinant],
+                                           [-1 * matrix_class.matrix_content[1][0] / determinant,
+                                            matrix_class.matrix_content[0][0] / determinant]]
         else:
             cofactors = []
             for row in range(matrix_class.rows):
@@ -246,7 +247,7 @@ class Matrix:
             raise MatrixException(Matrix.M_ERR_D[11])
         expression = expression.replace('^', '**')
         try:
-            temp = re.sub(Matrix.REG_MTRX, '1', expression)
+            temp = re.sub(Matrix.REG_MATRIX, '1', expression)
             eval(temp)
         except SyntaxError:
             raise MatrixException(Matrix.M_ERR_D[12])
@@ -254,7 +255,7 @@ class Matrix:
 
     @staticmethod
     def apply_matrix_classes(expression):
-        matches = list(set(re.findall(Matrix.REG_MTRX, expression)))
+        matches = list(set(re.findall(Matrix.REG_MATRIX, expression)))
         for m in range(len(matches)):
             expression = expression.replace(matches[m], f"Matrix('{matches[m]}')")
         return expression

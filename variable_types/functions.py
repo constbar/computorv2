@@ -1,8 +1,9 @@
 import re
-from utils import Utils
 from copy import deepcopy
 from itertools import product
-from polynomials import Polynomial, PolyCalc
+from variable_types.utils import Utils
+from variable_types.polynomials import Polynomial, PolyCalc
+
 
 class BracketVariable:
     """
@@ -14,7 +15,7 @@ class BracketVariable:
         self.factor = None
         self.power = None
 
-        if not 'x' in self.inpt:
+        if 'x' not in self.inpt:
             self.factor = float(inpt)
             self.power = 0
         else:
@@ -39,7 +40,7 @@ class BracketVariable:
 
     @property
     def get_power(self):
-        if not '^' in self.value:
+        if '^' not in self.value:
             return 1
         else:
             return float(self.value.split('^')[-1])
@@ -52,8 +53,10 @@ class BracketVariable:
     def __str__(self):
         return f'{Utils.try_int(self.factor)}x^{Utils.try_int(self.power)}'
 
+
 class FunctionException(Exception):
     pass
+
 
 class Function:
     """
@@ -74,9 +77,6 @@ class Function:
         5: 'variable function must be the same as in the expression',
         6: 'unknown variable must be in function brackets',
         7: 'the function itself must have an equal number of parentheses',
-        8: ''
-        # 5: 'unknown variable must not have been initialized before',
-        # 6: 'the function cannot be opened because it is not in the variables'
     }
 
     def __init__(self, inpt):
@@ -93,26 +93,26 @@ class Function:
         repl_par = function
         par_power_list = list(set(re.findall(Function.REG_IN_PW_PR, function)))
         if len(par_power_list):
-            for i in sorted(list(set(par_power_list)), key=len, reverse=True): # del list and set bec repeats
+            for i in sorted(par_power_list, key=len, reverse=True):
                 if '(' in i[1:]:
                     raise FunctionException(Function.F_ERR_D[2])
-                temp = Function.open_parentheses(i).strip('()')
+                temp = Function.open_parentheses(str(i)).strip('()')
                 temp = Function.apply_reduced_form(temp)
                 repl_par = repl_par.replace(i, f'({temp})')
             if not len(re.findall(r'[*/%]', repl_par)):
                 minus_par = re.findall(r'-\(.*?\)', repl_par)
                 if len(minus_par):
                     for i in sorted(list(set(minus_par)), key=len, reverse=True):
-                        temp = i.strip('-()').replace('-', '!').replace('+', '-')
+                        temp = str(i).strip('-()').replace('-', '!').replace('+', '-')
                         temp = '-' + temp.replace('!', '+')
                         repl_par = repl_par.replace(i, temp)
-                repl_par = '+' + repl_par.replace('(','').replace(')','')
+                repl_par = '+' + repl_par.replace('(', '').replace(')', '')
                 repl_par = Utils.clean_signs(repl_par)
                 repl_par = Function.apply_reduced_form(repl_par)
         else:
             try:
                 repl_par = Function.apply_reduced_form(repl_par)
-            except:
+            except Exception:
                 pass
         return repl_par
 
@@ -140,9 +140,7 @@ class Function:
                 final_output += fin[i].__str__()
             else:
                 final_output += fin[i].__str__() + '+'
-        return f'({Utils.clean_signs(final_output)})' # test it
-        # final_output = '(' + Utils.clean_signs(final_output) + ')'
-        # return final_output
+        return f'({Utils.clean_signs(final_output)})'
 
     def __add__(self, other):
         final_result = f'{self.func_content}+{other.func_content}'

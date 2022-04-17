@@ -29,9 +29,11 @@ class Utils:
             fin_sqrt = (num / temp + temp) / 2
         return fin_sqrt
 
+    @staticmethod
     def make_abs(num):
         return num * -1 if num < 0 else num
-        
+
+    @staticmethod
     def make_sin(num):
         r = num * num
         s = 42.0
@@ -52,9 +54,11 @@ class Utils:
         s = s * s
         return Utils.try_int((s - r) / (s + r))
 
+    @staticmethod
     def make_tan(num):
         return Utils.try_int(Utils.make_sin(num) / Utils.make_cos(num))
 
+    @staticmethod
     def make_atan(num):
         a = 1.0 / Utils.make_sqrt(1.0 + (num * num))
         b = 1.0
@@ -65,7 +69,6 @@ class Utils:
             n += 1
         return Utils.try_int(num / (Utils.make_sqrt(1.0 + (num * num)) * a))
 
+    @staticmethod
     def make_radians(n):
         return Utils.try_int(n * (3.1415 / 180))
-
-

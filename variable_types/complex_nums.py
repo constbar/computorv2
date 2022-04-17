@@ -1,19 +1,21 @@
 import re
-from utils import Utils
 from copy import deepcopy
+from variable_types.utils import Utils
+
 
 class ComplexException(Exception):
     pass
 
+
 class Complex:
     """
     REG_WRG_INP_I - check the input sequence
-    REG_POW_COMPL - search for all variables within an expression
+    REG_POW_CMPLX - search for all variables within an expression
     REG_CMPLX_VLS - search for all variables inside a sign-separated expression
     """
 
     REG_WRG_INP_I = r'[i]\d'
-    REG_POW_COMPL = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[i]\^\d+'
+    REG_POW_CMPLX = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[i]\^\d+'
     REG_CMPLX_VLS = r'(-?\d+\.\d+i|-?\d+i|-?\d*\.\d*|-?\d+|[^ 0-9])'
 
     C_ERR_D = {
@@ -56,7 +58,7 @@ class Complex:
         pair_2 = Complex(f'{self.re * other.im}i')
         pair_3 = Complex(f'{self.im * other.re}i')
         if self.complex:
-            pair_4 = Complex.exponentiate_line(f'{self.im * other.im}i^2')
+            pair_4 = Complex.process_exponents_nums(f'{self.im * other.im}i^2')
             pair_4 = Utils.clean_signs(pair_4)
         else:
             pair_4 = '0'
@@ -67,7 +69,7 @@ class Complex:
 
     def __truediv__(self, other):
         if self.complex is True and not self.re \
-            and other.complex is True and not other.re:
+                and other.complex is True and not other.re:
             self.re = self.im / other.im
             self.im = 0
             self.complex = False
@@ -102,7 +104,7 @@ class Complex:
         temp = deepcopy(self)
         if not self.re:
             self.im = self.im ** power.re
-            pw = Complex.exponentiate_line(f'i^{int(power.re)}')
+            pw = Complex.process_exponents_nums(f'i^{int(power.re)}')
             return Complex(str(self.im)) * Complex(Utils.clean_signs(pw))
         for i in range(int(power.re) - 1):
             temp = temp * self
@@ -115,6 +117,7 @@ class Complex:
         return_dict['imag'] = self.im
         return Complex.make_str_output(return_dict)
 
+    @staticmethod
     def make_str_output(res_dict):
         if not res_dict['real'] and not res_dict['imag']:
             return '0'
@@ -154,8 +157,8 @@ class Complex:
         return '+' + Complex.make_str_output(clx_dict)
 
     @staticmethod
-    def exponentiate_line(expression):
-        result = re.sub(Complex.REG_POW_COMPL, Complex.pow_replacer, expression)
+    def process_exponents_nums(expression):
+        result = re.sub(Complex.REG_POW_CMPLX, Complex.pow_replacer, expression)
         return result
 
     @staticmethod

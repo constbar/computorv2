@@ -27,7 +27,7 @@ test_2 = [
     'func(x) = 20x + 123 + 1x^2', 'func(x) = (20x + 1x)^3', 'func(x) = -(20x + 1x)^3',
     'func(b) = (1b + 23 + b)^2', 'func(x) = 2 * (10 + 2x)^2', 'func(y) = 2 * (10 + 2y)^2',
     'func(x) = (4 + 10x + 101x + 25x^2) / (16 + 8x^1 + 8x^1 + 4x^2) + 20x + 22 + 21 % 200']
-	
+
 test_3 = [
     'c = funca(x) + funcb(x)', 'c = funca(x) + funcb(x) + funcc(x) + funcd(x)', 
     'funca(x) = 2x + 12', 'funcb(x) = x + 2', 'funcc(x) = x', 'funcd(x) = 2 + 1', 'f(x)=x',
@@ -36,8 +36,7 @@ test_3 = [
 
 test_errors = [
     'func(x) = 2 + 5x)^2/(4+2x)^2+20x+123+22+21', 'func(x) = -z * 2 + 1', 'x=1x',
-    'func(x) = (2 + 5x)^4+20+123+312+123+3452345-(sdfsd)', 'func(x) =2x + () + (5x+2)^2',
-    'func(x) = ((2 + 5x)^2', 'func(x) =2x + ((()))(5x+2)^2', 'x = ((1x + 12))^2', '2x = z?']
-
+    'func(x) = (2 + 5x)^4 + 20 + 12 + 3 + 1 + 35 - (sdfsd)', 'func(x) = 2x + () + (5x+2)^2',
+    'func(x) = ((2 + 5x)^2', 'func(x) = 2x + ((()))(5x+2)^2', 'x = ((1x + 12))^2', '2x = z?']
 
 functions_tests = test_1 + test_2 + test_3 + test_errors

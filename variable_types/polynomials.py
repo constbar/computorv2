@@ -1,16 +1,11 @@
 import re
-import sys # delete it
-from utils import Utils
-from complex_nums import Complex
-
-# 109 str -> if big pow -> dont oveflow buffer raise
-# raises here not exits
-# print()a  all ansers intgreen
-# > 0 + x + 1 + 2x + 123=? # doessnt work
+from variable_types.utils import Utils
+from variable_types.complex_nums import Complex
 
 
 class PolynomialException(Exception):
     pass
+
 
 class Polynomial:
     REG_AFTER_X = r'([xX][^\^\-\+\=])'
@@ -24,7 +19,7 @@ class Polynomial:
     REG_1_POLY = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX](?:\^1)?'
     REG_2_POLY = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX]\^2'
 
-    P_ERR_DICT = { #maek ok nmumeration
+    P_ERR_DICT = {
         1: 'wrong syntax on the left side of the expression',
         2: 'wrong syntax on the right side of the expression', 
         3: 'expression must have an integer exponent',
@@ -37,7 +32,7 @@ class Polynomial:
 
     def __init__(self, equation, print_answer=False):
         self.orig = equation
-        self.cin = self.cutted_input
+        self.cin = self.cut_input
         self.check_errors()
         self.clean_data = self.sort_variables
         self.eq = PolyCalc(self.clean_data, print_answer)
@@ -46,7 +41,7 @@ class Polynomial:
         return self.clean_data
 
     @property
-    def cutted_input(self):
+    def cut_input(self):
         cut_inp = self.orig
         cut_inp = cut_inp.replace('\t', '').replace(' ', '')
         return cut_inp
@@ -127,15 +122,11 @@ class Polynomial:
             raise PolynomialException(self.P_ERR_DICT[5])
         elif re.findall(self.REG_AFTER_X, self.cin):
             raise PolynomialException(self.P_ERR_DICT[5])
-        elif re.findall(r'\^[\D]', self.cin):
+        elif re.findall(r'\^\D', self.cin):
             raise PolynomialException(self.P_ERR_DICT[5])
 
 
 class PolyCalc:
-    E_RET_DICT = { # maybe it unnessaary
-        1: 'the polynomial degree is strictly greater than 2. couldn\'t be solved',
-    }
-
     def __init__(self, data: dict, print_answer=False):
         self.data = data
         self.prec = 4
@@ -171,37 +162,36 @@ class PolyCalc:
         return degree
 
     def get_reduced_form(self):
-        #1 factor countd be 1 and power not be 0 1 при выводе
-
-        #2 can use re.sub(r'[()]', '', temp)
-              # make it noramal
-        # print('self.data', self.data)  #                      DEL
         max_len_of_input = max(map(len, map(str, map(int, (self.data.values())))))
         if max_len_of_input > self.prec:
             self.prec = max_len_of_input
         red_form = ''
         for i in self.data.keys():
             if self.data[i]:
-                red_form += f'{Utils.try_int(self.data[i])} * x^{i}+'
+                if i == 1:
+                    if self.data[i] == 1:
+                        red_form += f'x+'
+                    elif self.data[i] == -1:
+                        red_form += f'-x+'
+                    else:
+                        red_form += f'{Utils.try_int(self.data[i])}x+'
+                else:
+                    red_form += f'{Utils.try_int(self.data[i])}x^{i}+'
         red_form = red_form.replace('+-', ' - ').replace('+', ' + ')
         red_form = '- ' + red_form[1:] if red_form[0] == '-' else red_form
-        red_form = red_form[:-2].replace('*', '').replace(' ', '')
-        return red_form.replace('x^0', '')#.replace('x^1', 'x').replace('1x', 'x')
-        # return red_form # use here re sub
-
+        return red_form[:-2].replace(' ', '').replace('x^0', '')
 
     def print_final_result(self):
-        max_len_of_input = max(map(len, map(str,
-            map(int, (self.data.values())))))
+        max_len_of_input = max(map(len, map(str, map(int, (self.data.values())))))
         if max_len_of_input > self.prec:
             self.prec = max_len_of_input
 
         if self.check_high_poly:
-            raise PolynomialException(f'the polynomial degree', 
-                f'is strictly greater than 2. couldn\'t be solved')
+            raise PolynomialException(f'the polynomial degree is strictly ',
+                                      f'greater than 2. couldn\'t be solved')
         elif self.pol_dgr == 0:
             raise PolynomialException('no solution')
-        
+
         if self.disc is not None and self.disc != 0:
             print('there are two solutions:')
         else:
@@ -242,7 +232,6 @@ class PolyCalc:
             self.results.append(find_rational_solutions('-'))
         elif self.disc < 0:
             def find_complex_solutions(sign_type):
-                sign = 1.0 if sign_type == '+' else -1.0
                 numerator = f'{-1 * self.data[1]} {sign_type} {(-1 * self.disc) ** .5}i'
                 denominator = 2 * self.data[2]
                 cmplx_vals = re.findall(Complex.REG_CMPLX_VLS, numerator)
@@ -253,5 +242,3 @@ class PolyCalc:
             self.results.append(find_complex_solutions('-'))
         else:
             self.print_final_result()
-
-

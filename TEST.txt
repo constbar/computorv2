@@ -1,0 +1,21 @@
+
+
+Handler.handle_line('func(x) = mod([[1]])')
+
+# Handler.handle_line('c = mod(3i + 2) + 20')
+# Handler.handle_line('c = mod(3i + 2) + mod(23)')
+# Handler.handle_line('c = 3i + 2 + 2')
+# Handler.handle_line('cos(0) =?')
+# Handler.handle_line('sin(0) + cos(-1) =?')
+# Handler.handle_line('x = cos(122) + atan(22) + abs(-2) + sin(-3) - tan(2) + rad(2)')
+# Handler.handle_line('1+2=?') good
+# Handler.handle_line('func(x)=c?')
+# Handler.handle_line('func(x)=14?')
+
+# Handler.handle_line('funA(x) = z?')
+# Handler.handle_line('x+x= 2') # poly x = 0 # ne reshaetsya
+
+
+# print('12.2'.isnumeric())
+# Handler.handle_line("func(x) = 123123123x  - 2^3") #  good
+

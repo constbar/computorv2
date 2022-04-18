@@ -145,25 +145,6 @@ class Handler:
                     cls.val = cls.val.replace(repl, str(Utils.try_int(det)))
 
     @classmethod
-    def prepare_polynomial_key_val(cls):
-        try:
-            cls.key = cls.vals[cls.key]
-        except KeyError:
-            raise PolynomialException(Polynomial.P_ERR_DICT[1])
-        is_num = False
-        try:
-            float(cls.val[:-1])
-            cls.val = cls.val[:-1]
-            is_num = True
-        except ValueError:
-            pass
-        if not is_num:
-            try:
-                cls.val = cls.vals[cls.val[:-1]]
-            except KeyError:
-                raise PolynomialException(Polynomial.P_ERR_DICT[2])
-
-    @classmethod
     def substitute_vals_dict(cls):
         """
         substitution of funcs that are in the dictionary
@@ -265,7 +246,6 @@ class Handler:
             cmplx_result = mod
         else:
             cmplx_result = cls.res_line
-
         if re.findall(Complex.REG_WRG_INP_I, cmplx_result):
             raise ComplexException(Complex.C_ERR_D[3])
         cmplx_exp = Complex.process_exponents_nums(cmplx_result)
@@ -273,7 +253,6 @@ class Handler:
         cmplx_vals = re.findall(Complex.REG_CMPLX_VLS, cmplx_exp)
         exec_line = Complex.apply_complex_classes(cmplx_vals)
         exec_line = Utils.clean_signs(exec_line)
-
         if mod:
             return exec_line
         else:
@@ -311,6 +290,25 @@ class Handler:
         cls.val = str(Function(Function(cls.res_line).__str__()))
         cls.val = cls.val.replace('x', key_var)
         cls.prnt_hist_vals()
+
+    @classmethod
+    def prepare_polynomial_key_val(cls):
+        try:
+            cls.key = cls.vals[cls.key]
+        except KeyError:
+            raise PolynomialException(Polynomial.P_ERR_DICT[1])
+        is_num = False
+        try:
+            float(cls.val[:-1])
+            cls.val = cls.val[:-1]
+            is_num = True
+        except ValueError:
+            pass
+        if not is_num:
+            try:
+                cls.val = cls.vals[cls.val[:-1]]
+            except KeyError:
+                raise PolynomialException(Polynomial.P_ERR_DICT[2])
 
     @classmethod
     def handle_polynomial(cls, poly):

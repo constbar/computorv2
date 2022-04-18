@@ -2,11 +2,11 @@
 
 from cmd import Cmd
 from termcolor import colored
-from handler import HandlerException, Handler
-from variable_types.matrices import MatrixException
-from variable_types.functions import FunctionException
-from variable_types.complex_nums import ComplexException
-from variable_types.polynomials import PolynomialException
+from handler import Handler, HandlerException
+from math_types.matrices import MatrixException
+from math_types.functions import FunctionException
+from math_types.complex_nums import ComplexException
+from math_types.polynomials import PolynomialException
 
 
 class Comp(Cmd):

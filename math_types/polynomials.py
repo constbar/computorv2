@@ -1,6 +1,6 @@
 import re
-from variable_types.utils import Utils
-from variable_types.complex_nums import Complex
+from math_types.utils import Utils
+from math_types.complex_nums import Complex
 
 
 class PolynomialException(Exception):
@@ -166,26 +166,28 @@ class PolyCalc:
         if max_len_of_input > self.prec:
             self.prec = max_len_of_input
         red_form = ''
-        for i in self.data.keys():
-            if self.data[i]:
-                if i == 1:
+        for i in self.data.keys(): # eto stepen'
+            if self.data[i]:                    
+                if i == 0:
                     if self.data[i] == 1:
-                        red_form += f'x+'
+                        red_form += f'1+'
                     elif self.data[i] == -1:
-                        red_form += f'-x+'
+                        red_form += f'-1+'
                     else:
-                        red_form += f'{Utils.try_int(self.data[i])}x+'
+                        red_form += f'{Utils.try_int(self.data[i])}+'
                 else:
                     if self.data[i] == 1:
                         red_form += f'x^{i}+'
                     elif self.data[i] == -1:
                         red_form += f'-x^{i}+'
+                    elif i == 1:
+                        red_form += f'{Utils.try_int(self.data[i])}x+'
                     else:
                         red_form += f'{Utils.try_int(self.data[i])}x^{i}+'
         red_form = red_form.replace('+-', ' - ').replace('+', ' + ')
         red_form = '- ' + red_form[1:] if red_form[0] == '-' else red_form
-        red_form = red_form[:-2].replace(' ', '').replace('x^0', '')
-        return '1' if not red_form else red_form
+        red_form = red_form[:-2].replace(' ', '')
+        return red_form
 
     def print_final_result(self):
         max_len_of_input = max(map(len, map(str, map(int, (self.data.values())))))

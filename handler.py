@@ -1,9 +1,9 @@
 import re
-from variable_types.utils import Utils
-from variable_types.matrices import Matrix, MatrixException
-from variable_types.functions import Function, FunctionException
-from variable_types.complex_nums import Complex, ComplexException
-from variable_types.polynomials import Polynomial, PolynomialException
+from math_types.utils import Utils
+from math_types.matrices import Matrix, MatrixException
+from math_types.functions import Function, FunctionException
+from math_types.complex_nums import Complex, ComplexException
+from math_types.polynomials import Polynomial, PolynomialException
 
 
 class HandlerException(Exception):
@@ -25,11 +25,11 @@ class Handler:
     REG_DCT_VLS = r'(\d+\.\d+|\w+|[^ 0-9])'
     REG_FLT_EXP = r'\^(?:(?:\d*\.))'
     REG_NEG_EXP = r'\^(?:(?:-[2-9]))'
-    REG_POW_RAT = r'(?:(?:-?\d+\.?\d?))\^[\d+]'
-    REG_POW_RAT_BRT = r'\(-?\d+\.?\d+\)\^\d+'
+    REG_POW_RAT = r'(?:(?:-?\d+\.?\d?))\^\d+'
+    REG_POW_RAT_BRT = r'\([-+]?\d+\.?[\d+]?\)\^\d+'
     REG_POLY_EXEC = r'(?:(?:[a-z]+)|(?:-?\d+\.?\d+))\?'
     REG_CLSD_FUNC = r'fun[a-z]+\(.*?\)'
-    REG_OPEN_FUNC = r'fun[a-z]+\(\d+\.?\d+\)'
+    REG_OPEN_FUNC = r'fun[a-z]+\([-+]?\d+\.?[\d+]?\)'
 
     REG_MOD = r'mod\(.*?\)'
     REG_ABS = r'abs\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
@@ -157,7 +157,6 @@ class Handler:
                 cls.val = cls.val.replace(i, cls.vals[i])
             except KeyError:
                 continue
-
         stored_open_funcs = re.findall(cls.REG_OPEN_FUNC, cls.val)
         for i in sorted(list(set(stored_open_funcs)), key=len, reverse=True):
             stored_value = i[str(i).find('(') + 1: str(i).find(')')]
@@ -288,7 +287,7 @@ class Handler:
             raise FunctionException(Function.F_ERR_D[7])
         cls.res_line = cls.res_line.replace(literal_vals[0], 'x')
         cls.val = str(Function(Function(cls.res_line).__str__()))
-        cls.val = cls.val.replace('x', key_var)
+        cls.val = Utils.clean_signs(cls.val.replace('x', key_var))
         cls.prnt_hist_vals()
 
     @classmethod

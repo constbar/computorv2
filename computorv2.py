@@ -42,6 +42,7 @@ class Comp(Cmd):
     def do_reset(self, _):
         Handler.hist = list()
         Handler.vals = dict()
+        print('command history and saved variables cleared')
 
     def help_reset(self):
         print('clear command history and saved variables')

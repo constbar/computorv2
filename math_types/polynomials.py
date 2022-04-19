@@ -166,7 +166,7 @@ class PolyCalc:
         if max_len_of_input > self.prec:
             self.prec = max_len_of_input
         red_form = ''
-        for i in self.data.keys(): # eto stepen'
+        for i in self.data.keys():
             if self.data[i]:                    
                 if i == 0:
                     if self.data[i] == 1:
@@ -175,19 +175,23 @@ class PolyCalc:
                         red_form += f'-1+'
                     else:
                         red_form += f'{Utils.try_int(self.data[i])}+'
+                elif i == 1:
+                    if self.data[i] == 1:
+                        red_form += f'x+'
+                    elif self.data[i] == -1:
+                        red_form += f'-x+'
+                    else:
+                        red_form += f'{Utils.try_int(self.data[i])}x+'
                 else:
                     if self.data[i] == 1:
                         red_form += f'x^{i}+'
-                    elif self.data[i] == -1:
+                    elif self.data[i] == 1:
                         red_form += f'-x^{i}+'
-                    elif i == 1:
-                        red_form += f'{Utils.try_int(self.data[i])}x+'
                     else:
                         red_form += f'{Utils.try_int(self.data[i])}x^{i}+'
         red_form = red_form.replace('+-', ' - ').replace('+', ' + ')
         red_form = '- ' + red_form[1:] if red_form[0] == '-' else red_form
-        red_form = red_form[:-2].replace(' ', '')
-        return red_form
+        return red_form[:-2].replace(' ', '')
 
     def print_final_result(self):
         max_len_of_input = max(map(len, map(str, map(int, (self.data.values())))))

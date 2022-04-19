@@ -25,9 +25,9 @@ class Handler:
     REG_DCT_VLS = r'(\d+\.\d+|\w+|[^ 0-9])'
     REG_FLT_EXP = r'\^(?:(?:\d*\.))'
     REG_NEG_EXP = r'\^(?:(?:-[2-9]))'
-    REG_POW_RAT = r'(?:(?:-?\d+\.?\d?))\^\d+'
+    REG_POW_RAT = r'(?:(?:-?\d+)|(?:-?\d*\.\d*))\^\d+'
     REG_POW_RAT_BRT = r'\([-+]?\d+\.?[\d+]?\)\^\d+'
-    REG_POLY_EXEC = r'(?:(?:[a-z]+)|(?:-?\d+\.?\d+))\?'
+    REG_POLY_EXEC = r'(?:(?:[a-z]+)|(?:-?\d+)|(?:-?\d*\.\d*))\?'
     REG_CLSD_FUNC = r'fun[a-z]+\(.*?\)'
     REG_OPEN_FUNC = r'fun[a-z]+\([-+]?\d+\.?[\d+]?\)'
 
@@ -93,7 +93,6 @@ class Handler:
 
         if cls.pre_line.count('=') != 1:
             raise HandlerException(cls.H_ERR_DICT[1])
-
         elif not all(cls.pre_line.split('=')):
             raise HandlerException(cls.H_ERR_DICT[2])
         elif cls.pre_line.endswith('=?') and not cls.pre_line.startswith('=?'):
@@ -115,7 +114,7 @@ class Handler:
     def substitute_math_formulas(cls):
         """
         substitution of mathematical formulas
-        substitution of modules complex nuьы and matrices
+        substitution of modules complex nums and matrices
         """
         formulas_list = [Utils.make_abs, Utils.make_sin, Utils.make_cos,
                          Utils.make_atan, Utils.make_tan, Utils.make_radians]
@@ -157,6 +156,7 @@ class Handler:
                 cls.val = cls.val.replace(i, cls.vals[i])
             except KeyError:
                 continue
+
         stored_open_funcs = re.findall(cls.REG_OPEN_FUNC, cls.val)
         for i in sorted(list(set(stored_open_funcs)), key=len, reverse=True):
             stored_value = i[str(i).find('(') + 1: str(i).find(')')]
@@ -234,6 +234,7 @@ class Handler:
                 if '(' in str(cls.key) or ')' in str(cls.key):
                     if not cls.key.count('(') == cls.key.count(')'):
                         raise HandlerException(cls.H_ERR_DICT[8])
+                cls.res_line = cls.res_line.replace('^', '**')
                 cls.val = Utils.try_int(eval(cls.res_line))
                 cls.prnt_hist_vals()
         elif len(literal_vals) == 1:

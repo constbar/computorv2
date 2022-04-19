@@ -100,7 +100,6 @@ class Polynomial:
             clear_vars(left_dict, right_dict)
         except ValueError:
             raise PolynomialException(self.P_ERR_DICT[5])
-        equal_sides = left_dict == right_dict
         return {key: left_dict.get(key, 0) - right_dict.get(key, 0)
                 for key in set(left_dict) | set(right_dict)}
 

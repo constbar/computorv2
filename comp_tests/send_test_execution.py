@@ -10,9 +10,12 @@ from termcolor import colored
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) > 2:
+    if len(sys.argv) > 2 or sys.argv[1] in ['-h', '--help']:
         print('for all tests, run the program without arguments')
         print('for specific cases, enter the name of the test')
+        print('options:')
+        print('matrices_tests', 'functions_tests', sep='\n')
+        print('complex_nums_tests', 'rationals_syntax_tests', sep='\n')
         sys.exit()
     elif len(sys.argv) == 2:
         if sys.argv[1] == 'matrices_tests':

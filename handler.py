@@ -140,7 +140,7 @@ class Handler:
                     try:
                         det = Matrix.get_determinant(exec_cl_value.matrix_content)
                     except Exception:
-                        raise MatrixException(Matrix.M_ERR_D[1])
+                        raise MatrixException(Matrix.M_ERR_D[8])
                     cls.val = cls.val.replace(repl, str(Utils.try_int(det)))
 
     @classmethod

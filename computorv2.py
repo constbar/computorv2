@@ -39,6 +39,13 @@ class Comp(Cmd):
     def help_variables(self):
         print('display a list of saved variables and their values')
 
+    def do_reset(self, _):
+        Handler.hist = list()
+        Handler.vals = dict()
+
+    def help_reset(self):
+        print('clear command history and saved variables')
+
     def default(self, line):
         try:
             Handler.handle_line(line)

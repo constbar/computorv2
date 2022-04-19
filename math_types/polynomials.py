@@ -20,14 +20,11 @@ class Polynomial:
     REG_2_POLY = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX]\^2'
 
     P_ERR_DICT = {
-        1: 'wrong syntax on the left side of the expression',
-        2: 'wrong syntax on the right side of the expression', 
-        3: 'expression must have an integer exponent',
-        4: 'expression must have a non-negative exponent',
-        5: 'expression can only have allowed syntax',
-        6: 'it is just a numerical equation. no solution',
-        7: 'it is an incorrect numerical equation. no solution',
-        8: 'each real number is a solution',
+        1: 'wrong syntax on the left side of the polynomial expression',
+        2: 'wrong syntax on the right side of the polynomial expression', 
+        3: 'polynomial expression must have an integer exponent',
+        4: 'polynomial expression must have a non-negative exponent',
+        5: 'polynomial expression can only have allowed syntax',
     }
 
     def __init__(self, equation, print_answer=False):
@@ -104,12 +101,6 @@ class Polynomial:
         except ValueError:
             raise PolynomialException(self.P_ERR_DICT[5])
         equal_sides = left_dict == right_dict
-        if equal_sides and 'x' not in self.cin.lower():
-            raise PolynomialException(self.P_ERR_DICT[6])
-        elif 'x' not in self.cin.lower():
-            raise PolynomialException(self.P_ERR_DICT[7])
-        elif equal_sides:
-            raise PolynomialException(self.P_ERR_DICT[8])
         return {key: left_dict.get(key, 0) - right_dict.get(key, 0)
                 for key in set(left_dict) | set(right_dict)}
 
@@ -162,6 +153,9 @@ class PolyCalc:
         return degree
 
     def get_reduced_form(self):
+        if all(value == 0 for value in self.data.values()):
+            return '0'
+
         max_len_of_input = max(map(len, map(str, map(int, (self.data.values())))))
         if max_len_of_input > self.prec:
             self.prec = max_len_of_input
@@ -199,8 +193,8 @@ class PolyCalc:
             self.prec = max_len_of_input
 
         if self.check_high_poly:
-            raise PolynomialException(f'the polynomial degree is strictly ',
-                                      f'greater than 2. could not be solved')
+            raise PolynomialException(
+                'the polynomial degree is strictly greater than 2. could not be solved')
         elif self.pol_dgr == 0:
             raise PolynomialException('no solution')
 

@@ -80,13 +80,19 @@ class Handler:
 
     @classmethod
     def read_expression(cls, input_line):
+        """
+        incoming string processing
+        print the element if it exists in the value dictionary
+        instant calculation if there is a sign "for execution"
+        """
         cls.inst_calc = False
         cls.pre_line = input_line.lower()
         cls.pre_line = cls.pre_line.replace('\t', '').replace(' ', '')
 
         if cls.pre_line in cls.vals.keys():
             if '[[' in cls.vals[cls.pre_line]:
-                print(cls.vals[cls.pre_line][1:-1].replace(';', '\n'))
+                print(cls.vals[cls.pre_line].replace('[[', '[').
+                    replace(']]', ']').replace(';', '\n'))
             else:
                 print(cls.vals[cls.pre_line])
             raise
@@ -98,9 +104,13 @@ class Handler:
         elif cls.pre_line.endswith('=?') and not cls.pre_line.startswith('=?'):
             cls.inst_calc = True
             cls.val = cls.pre_line.split('=')[0]
+            if 'fun' in cls.val:
+                cls.substitute_func_val()
 
         if cls.inst_calc is False:
             cls.key, cls.val = cls.pre_line.split('=')
+            if 'fun' in cls.val:
+                cls.substitute_func_val()
             if cls.key == 'i':
                 raise HandlerException(cls.H_ERR_DICT[3])
             elif 'fun' in cls.key:
@@ -109,6 +119,28 @@ class Handler:
                     cls.handle_polynomial(f'{cls.key}={cls.val}')
             elif re.search(r'\d', cls.key):
                 raise HandlerException(cls.H_ERR_DICT[4])
+
+    @classmethod
+    def substitute_func_val(cls):
+        """
+        substitution of a value from a dictionary
+        for an instant calculation function
+        """
+        stored_vals_list = re.findall(cls.REG_CLSD_FUNC, cls.val)
+        for repl in sorted(list(set(stored_vals_list)), key=len, reverse=True):
+            cleared_value = repl[repl.find('(') + 1: repl.find(')')]
+            is_num = False
+            try:
+                float(cleared_value)
+                is_num = True
+            except ValueError:
+                pass
+            if not is_num:
+                try:
+                    new_val = repl.replace(f'({cleared_value})', f'({cls.vals[cleared_value]})')
+                    cls.val = cls.val.replace(repl, new_val)
+                except KeyError:
+                    pass
 
     @classmethod
     def substitute_math_formulas(cls):
@@ -182,7 +214,10 @@ class Handler:
         for i in range(len(val_list)):
             if val_list[i].isalpha():
                 try:
-                    val_list[i] = str(cls.vals[val_list[i]])
+                    if '[' in cls.vals[val_list[i]]:
+                        val_list[i] = f'{cls.vals[val_list[i]]}'
+                    else:
+                        val_list[i] = f'({cls.vals[val_list[i]]})'
                 except KeyError:
                     continue
         cls.res_line = ''.join(val_list)
@@ -223,6 +258,7 @@ class Handler:
             is_complex = True
         except ValueError:
             pass
+
         if len(literal_vals) > 1:
             raise HandlerException(cls.H_ERR_DICT[7])
         elif len(literal_vals) == 0 and is_complex:
@@ -234,7 +270,7 @@ class Handler:
                 if '(' in str(cls.key) or ')' in str(cls.key):
                     if not cls.key.count('(') == cls.key.count(')'):
                         raise HandlerException(cls.H_ERR_DICT[8])
-                cls.res_line = cls.res_line.replace('^', '**')
+                cls.res_line = cls.res_line.replace('^*', '**').replace('^', '**')
                 cls.val = Utils.try_int(eval(cls.res_line))
                 cls.prnt_hist_vals()
         elif len(literal_vals) == 1:
@@ -321,14 +357,17 @@ class Handler:
     @classmethod
     def prnt_hist_vals(cls):
         if '[[' in str(cls.val):
-            print(cls.val[1:-1])
+            print(cls.val.replace('[[', '[').replace(']]', ']'))
         else:
             print(cls.val)
         if cls.inst_calc is False:
             if isinstance(cls.val, (int, float)):
                 cls.vals[cls.key] = str(cls.val)
             elif '[' in cls.val:
-                cls.vals[cls.key] = '[' + cls.val.replace('\n', ';') + ']'
+                if re.search(r'[a-z]', cls.val):
+                    cls.vals[cls.key] = cls.val.replace('\n', ';')
+                else:
+                    cls.vals[cls.key] = '[' + cls.val.replace('\n', ';') + ']'
             else:
                 cls.vals[cls.key] = str(cls.val)
         cls.hist.append(f'{cls.pre_line.split("=")[0]} -> {cls.val}')

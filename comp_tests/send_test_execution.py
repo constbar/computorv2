@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import sys
 import zmq
 import matrices_tests
 import functions_tests
@@ -8,15 +9,21 @@ from random import randint
 import rationals_syntax_tests
 from termcolor import colored
 
+
+def help_func():
+    print('for all tests, run the program without arguments')
+    print('for specific cases, enter the name of the test')
+    print('options:')
+    print('matrices_tests', 'functions_tests', sep='\n')
+    print('complex_nums_tests', 'rationals_syntax_tests', sep='\n')
+    sys.exit()
+
+
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) > 2 or sys.argv[1] in ['-h', '--help']:
-        print('for all tests, run the program without arguments')
-        print('for specific cases, enter the name of the test')
-        print('options:')
-        print('matrices_tests', 'functions_tests', sep='\n')
-        print('complex_nums_tests', 'rationals_syntax_tests', sep='\n')
-        sys.exit()
+    if len(sys.argv) > 2:
+        help_func()
+    elif len(sys.argv) == 2 and sys.argv[1] in ['-h', '--help']:
+        help_func()
     elif len(sys.argv) == 2:
         if sys.argv[1] == 'matrices_tests':
             tests = matrices_tests.matrices_tests
@@ -50,4 +57,3 @@ if __name__ == '__main__':
             socket.send(f'exp = {tests[r]}'.encode())
         message = socket.recv()
         print('sent:', colored(tests[r], 'green'))
-        

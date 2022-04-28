@@ -268,12 +268,7 @@ class Handler:
             if '[[' in cls.res_line:
                 cls.handle_matrices()
             else:
-                if '(' in str(cls.key) or ')' in str(cls.key):
-                    if not cls.key.count('(') == cls.key.count(')'):
-                        raise HandlerException(cls.H_ERR_DICT[8])
-                cls.res_line = cls.res_line.replace('^*', '**').replace('^', '**')
-                cls.val = Utils.try_int(eval(cls.res_line))
-                cls.prnt_hist_vals()
+                cls.handle_rationals()
         elif len(literal_vals) == 1:
             cls.handle_functions(literal_vals)
 
@@ -309,6 +304,17 @@ class Handler:
         else:
             cls.val = f'{eval(exec_line)}'
             cls.prnt_hist_vals()
+
+    @classmethod
+    def handle_rationals(cls):
+        if '(' in str(cls.key) or ')' in str(cls.key):
+            if not cls.key.count('(') == cls.key.count(')'):
+                raise HandlerException(cls.H_ERR_DICT[8])
+        if '--' in cls.res_line:
+            raise HandlerException(cls.H_ERR_DICT[8])
+        cls.res_line = cls.res_line.replace('^*', '**').replace('^', '**')
+        cls.val = Utils.try_int(eval(cls.res_line))
+        cls.prnt_hist_vals()
 
     @classmethod
     def handle_functions(cls, literal_vals):

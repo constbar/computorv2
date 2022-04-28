@@ -8,16 +8,16 @@ class PolynomialException(Exception):
 
 
 class Polynomial:
-    REG_AFTER_X = r'([xX][^\^\-\+\=])'
-    REG_NEG_EXP = r'[xX]\^(?:(?:-\d))'
-    REG_FLT_EXP = r'[xX]\^(?:(?:\d*\.))'
-    REG_WRG_INP = r'[^xX\d*\d*\.\d*\^\=\*\-\+]'
-    REG_HGH_EXP = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX]\^(?:(?:\d{2,})|(?:[3-9]))'
+    REGEX_AFTER_X = r'([xX][^\^\-\+\=])'
+    REGEX_NEG_EXP = r'[xX]\^(?:(?:-\d))'
+    REGEX_FLT_EXP = r'[xX]\^(?:(?:\d*\.))'
+    REGEX_WRG_INP = r'[^xX\d*\d*\.\d*\^\=\*\-\+]'
+    REGEX_HGH_EXP = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX]\^(?:(?:\d{2,})|(?:[3-9]))'
 
-    REG_00_POL = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX]\^0'
-    REG_01_POL = r'[-+]?(?:(?:\d*\.\d*)|(?:\d+))'
-    REG_1_POLY = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX](?:\^1)?'
-    REG_2_POLY = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX]\^2'
+    REGEX_00_POL = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX]\^0'
+    REGEX_01_POL = r'[-+]?(?:(?:\d*\.\d*)|(?:\d+))'
+    REGEX_1_POLY = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX](?:\^1)?'
+    REGEX_2_POLY = r'[-+]?(?:(?:\d*)|(?:\d*\.\d*))\*?[xX]\^2'
 
     P_ERR_DICT = {
         1: 'wrong syntax on the left side of the polynomial expression',
@@ -49,7 +49,7 @@ class Polynomial:
         left_dict = dict()
         right_dict = dict()
         pos_exps = list(set(int(i.split('^')[-1]) for i in
-                            re.findall(self.REG_HGH_EXP, self.cin)))
+                            re.findall(self.REGEX_HGH_EXP, self.cin)))
 
         def handle_exps(left_input, right_input):
             for i in pos_exps:
@@ -59,8 +59,8 @@ class Polynomial:
                 right_dict[i] = re.findall(reg_pos, right_input)
                 right_input = re.sub(reg_pos, '', right_input)
 
-            reg_list = [(2, self.REG_2_POLY), (0, self.REG_00_POL),
-                        (1, self.REG_1_POLY), (0, self.REG_01_POL)]
+            reg_list = [(2, self.REGEX_2_POLY), (0, self.REGEX_00_POL),
+                        (1, self.REGEX_1_POLY), (0, self.REGEX_01_POL)]
             for e, r in reg_list:
                 if e in left_dict:
                     left_dict[e].extend(re.findall(r, left_input))
@@ -80,21 +80,15 @@ class Polynomial:
 
         def clear_vars(l_part: dict, r_part: dict):
             for k in {**l_part, **r_part}.keys():
-                l_part[k] = [i.split('^')[0].lower()
-                             if '^' in i else i for i in l_part[k]]
+                l_part[k] = [i.split('^')[0].lower() if '^' in i else i for i in l_part[k]]
                 l_part[k] = [i.lower().replace('+', '') for i in l_part[k]]
-                l_part[k] = ['1' if i == 'x' else '-1' if i ==
-                             '-x' else i for i in l_part[k]]
-                l_part[k] = sum(float(i.replace('*', '').replace('x', ''))
-                                for i in l_part[k])
+                l_part[k] = ['1' if i == 'x' else '-1' if i == '-x' else i for i in l_part[k]]
+                l_part[k] = sum(float(i.replace('*', '').replace('x', '')) for i in l_part[k])
 
-                r_part[k] = [i.split('^')[0].lower()
-                             if '^' in i else i for i in r_part[k]]
+                r_part[k] = [i.split('^')[0].lower() if '^' in i else i for i in r_part[k]]
                 r_part[k] = [i.lower().replace('+', '') for i in r_part[k]]
-                r_part[k] = ['1' if i == 'x' else '-1' if i ==
-                             '-x' else i for i in r_part[k]]
-                r_part[k] = sum(float(i.replace('*', '').replace('x', ''))
-                                for i in r_part[k])
+                r_part[k] = ['1' if i == 'x' else '-1' if i == '-x' else i for i in r_part[k]]
+                r_part[k] = sum(float(i.replace('*', '').replace('x', '')) for i in r_part[k])
 
         try:
             clear_vars(left_dict, right_dict)
@@ -104,13 +98,13 @@ class Polynomial:
                 for key in set(left_dict) | set(right_dict)}
 
     def check_errors(self):
-        if re.findall(self.REG_FLT_EXP, self.cin):
+        if re.findall(self.REGEX_FLT_EXP, self.cin):
             raise PolynomialException(self.P_ERR_DICT[3])
-        elif re.findall(self.REG_NEG_EXP, self.cin):
+        elif re.findall(self.REGEX_NEG_EXP, self.cin):
             raise PolynomialException(self.P_ERR_DICT[4])
-        elif re.findall(self.REG_WRG_INP, self.cin):
+        elif re.findall(self.REGEX_WRG_INP, self.cin):
             raise PolynomialException(self.P_ERR_DICT[5])
-        elif re.findall(self.REG_AFTER_X, self.cin):
+        elif re.findall(self.REGEX_AFTER_X, self.cin):
             raise PolynomialException(self.P_ERR_DICT[5])
         elif re.findall(r'\^\D', self.cin):
             raise PolynomialException(self.P_ERR_DICT[5])
@@ -158,6 +152,7 @@ class PolyCalc:
         max_len_of_input = max(map(len, map(str, map(int, (self.data.values())))))
         if max_len_of_input > self.prec:
             self.prec = max_len_of_input
+
         red_form = ''
         for i in self.data.keys():
             if self.data[i]:                    
@@ -182,6 +177,7 @@ class PolyCalc:
                         red_form += f'-x^{i}+'
                     else:
                         red_form += f'{Utils.try_int(self.data[i])}x^{i}+'
+
         red_form = red_form.replace('+-', ' - ').replace('+', ' + ')
         red_form = '- ' + red_form[1:] if red_form[0] == '-' else red_form
         return red_form[:-2].replace(' ', '')
@@ -225,8 +221,7 @@ class PolyCalc:
     def calc_quadratic_func(self):
         self.disc = self.data[1]**2 - 4 * self.data[2] * self.data[0]
         if self.disc == 0:
-            self.results.append((-1.0 * self.data[1]) /
-                                (2 * self.data[2]))
+            self.results.append((-1.0 * self.data[1]) / (2 * self.data[2]))
         elif self.disc > 0:
             def find_rational_solutions(sign_type):
                 sign = 1.0 if sign_type == '+' else -1.0
@@ -239,7 +234,7 @@ class PolyCalc:
             def find_complex_solutions(sign_type):
                 numerator = f'{-1 * self.data[1]} {sign_type} {(-1 * self.disc) ** .5}i'
                 denominator = 2 * self.data[2]
-                cmplx_vals = re.findall(Complex.REG_CMPLX_VLS, numerator)
+                cmplx_vals = re.findall(Complex.REGEX_CMPLX_VLS, numerator)
                 exec_line = Complex.apply_complex_classes(cmplx_vals)
                 exec_line = f"({Utils.clean_signs(exec_line)})/Complex('{denominator}')"
                 return f'{eval(exec_line)}'

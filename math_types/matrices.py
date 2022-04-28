@@ -9,14 +9,14 @@ class MatrixException(Exception):
 
 class Matrix:
     """
-    REG_POW_MAT - check if the matrix is raised to the power of the matrix
-    REG_MTRX - find all matrices in an expression
+    REGEX_POW_MAT - check if the matrix is raised to the power of the matrix
+    REGEX_MATRIX - find all matrices in an expression
     """
 
-    REG_POW_MAT = r'\]\^-?\['
-    REG_MATRIX = r'\[(?:\[(?:-?\d+[.]?[d+]?,?)+\];?)+\]'
+    REGEX_POW_MAT = r'\]\^-?\['
+    REGEX_MATRIX = r'\[(?:\[(?:-?\d+[.]?[d+]?,?)+\];?)+\]'
 
-    M_ERR_D = {
+    M_ERR_DICT = {
         1: 'matrix could not be empty',
         2: 'the interior parts of the matrix must be equal',
         3: 'invalid matrix content',
@@ -33,13 +33,13 @@ class Matrix:
 
     def __init__(self, inpt):
         if inpt == '[[]]':
-            raise MatrixException(Matrix.M_ERR_D[1])
+            raise MatrixException(Matrix.M_ERR_DICT[1])
 
         self.raw_inp = inpt[1:-1].split(';')
         self.matrix_content = self.cleaned_input
 
         if not self.check_uniformity():
-            raise MatrixException(Matrix.M_ERR_D[2])
+            raise MatrixException(Matrix.M_ERR_DICT[2])
 
         self.inversed = False
         self.rows = len(self.matrix_content)
@@ -50,7 +50,7 @@ class Matrix:
         try:
             return [list(map(float, i.strip('[]').split(','))) for i in self.raw_inp]
         except ValueError:
-            raise MatrixException(Matrix.M_ERR_D[3])
+            raise MatrixException(Matrix.M_ERR_DICT[3])
 
     def check_uniformity(self):
         return len(set(map(len, self.matrix_content))) == 1
@@ -60,7 +60,7 @@ class Matrix:
 
     def __add__(self, other):
         if not self.check_size_equality(other):
-            raise MatrixException(Matrix.M_ERR_D[4])
+            raise MatrixException(Matrix.M_ERR_DICT[4])
         for row in range(self.rows):
             self.matrix_content[row] = list(
                 zip(self.matrix_content[row], other.matrix_content[row]))
@@ -69,7 +69,7 @@ class Matrix:
 
     def __sub__(self, other):
         if not self.check_size_equality(other):
-            raise MatrixException(Matrix.M_ERR_D[4])
+            raise MatrixException(Matrix.M_ERR_DICT[4])
         for row in range(self.rows):
             other.matrix_content[row] = [i * -1 for i in other.matrix_content[row]]
             self.matrix_content[row] = list(
@@ -86,7 +86,7 @@ class Matrix:
                     for col in range(self.cols):
                         self.matrix_content[row][col] *= other.matrix_content[row][col]
             else:
-                raise MatrixException(Matrix.M_ERR_D[5])
+                raise MatrixException(Matrix.M_ERR_DICT[5])
         self.recalculate_matrix()
         return self
 
@@ -105,7 +105,7 @@ class Matrix:
         other = deepcopy(power)
         if type(self) == type(other):
             if self.cols != other.rows:
-                raise MatrixException(Matrix.M_ERR_D[6])
+                raise MatrixException(Matrix.M_ERR_DICT[6])
             ret_matrix = self.make_empty_matrix(self.rows, other.cols)
             rotated_other = self.rotate_matrix(other, other.rows, other.cols)
 
@@ -123,7 +123,7 @@ class Matrix:
             return self
 
         elif not round(power) == power:
-            raise MatrixException(Matrix.M_ERR_D[7])
+            raise MatrixException(Matrix.M_ERR_DICT[7])
         elif power == 0:
             m = max(self.rows, self.cols)
             identity_matrix = self.make_empty_matrix(m, m)
@@ -135,11 +135,11 @@ class Matrix:
             self.recalculate_matrix()
             return self
         elif self.rows != self.cols:
-            raise MatrixException(Matrix.M_ERR_D[8])
+            raise MatrixException(Matrix.M_ERR_DICT[8])
         elif power == -1:
             return Matrix.inverse_matrix(self)
         elif power < 0:
-            raise MatrixException(Matrix.M_ERR_D[9])
+            raise MatrixException(Matrix.M_ERR_DICT[9])
 
         temp = deepcopy(self)
         for i in range(power - 1):
@@ -148,7 +148,7 @@ class Matrix:
         return temp
 
     def __rpow__(self, power):
-        raise MatrixException(Matrix.M_ERR_D[11])
+        raise MatrixException(Matrix.M_ERR_DICT[11])
 
     def __str__(self):
         return_str = ''
@@ -196,7 +196,7 @@ class Matrix:
         rows_len = len(matrix_list)
         cols_len = len(matrix_list[0])
         if rows_len != cols_len:
-            raise MatrixException(Matrix.M_ERR_D[8])
+            raise MatrixException(Matrix.M_ERR_DICT[8])
         elif rows_len == 1:
             return matrix_list[0][0]
         elif rows_len == 2:
@@ -214,7 +214,7 @@ class Matrix:
     def inverse_matrix(matrix_class):
         determinant = Matrix.get_determinant(matrix_class.matrix_content)
         if determinant == 0:
-            raise MatrixException(Matrix.M_ERR_D[10])
+            raise MatrixException(Matrix.M_ERR_DICT[10])
         elif matrix_class.rows == 1:
             matrix_class.matrix_content[0][0] = 1 / matrix_class.matrix_content[0][0]
         elif matrix_class.rows == 2:
@@ -243,19 +243,19 @@ class Matrix:
 
     @staticmethod
     def check_full_line(expression):
-        if re.findall(Matrix.REG_POW_MAT, expression):
-            raise MatrixException(Matrix.M_ERR_D[11])
+        if re.findall(Matrix.REGEX_POW_MAT, expression):
+            raise MatrixException(Matrix.M_ERR_DICT[11])
         expression = expression.replace('^', '**')
         try:
-            temp = re.sub(Matrix.REG_MATRIX, '1', expression)
+            temp = re.sub(Matrix.REGEX_MATRIX, '1', expression)
             eval(temp)
         except SyntaxError:
-            raise MatrixException(Matrix.M_ERR_D[12])
+            raise MatrixException(Matrix.M_ERR_DICT[12])
         return expression
 
     @staticmethod
     def apply_matrix_classes(expression):
-        matches = list(set(re.findall(Matrix.REG_MATRIX, expression)))
+        matches = list(set(re.findall(Matrix.REGEX_MATRIX, expression)))
         for m in range(len(matches)):
             expression = expression.replace(matches[m], f"Matrix('{matches[m]}')")
         return expression

@@ -12,34 +12,35 @@ class HandlerException(Exception):
 
 class Handler:
     """
-    REG_DCT_VLS - substitute values from the internal dictionary
-    REG_FLT_EXP - check for integer powers of a number
-    REG_NEG_EXP - check for non-negative powers of a number
-    REG_POW_RAT - substitute powers for rational numbers
-    REG_POW_RAT_BRT - substitute powers for rational numbers in brackets
-    REG_POLY_EXEC - validation of the right side for a polynomial
-    REG_CLSD_FUNC - handling inside brackets for functions
-    REG_OPEN_FUNC - processing for functions without brackets
+    REGEX_DCT_VLS - substitute values from the internal dictionary
+    REGEX_FLT_EXP - check for integer powers of a number
+    REGEX_NEG_EXP - check for non-negative powers of a number
+    REGEX_POW_RAT - substitute powers for rational numbers
+    REGEX_POW_RAT_BRT - substitute powers for rational numbers in brackets
+    REGEX_POLY_EXEC - validation of the right side for a polynomial
+    REGEX_CLSD_FUNC - handling inside brackets for functions
+    REGEX_OPEN_FUNC - processing for functions without brackets
     """
 
-    REG_DCT_VLS = r'(\d+\.\d+|\w+|[^ 0-9])'
-    REG_FLT_EXP = r'\^(?:(?:\d*\.))'
-    REG_NEG_EXP = r'\^(?:(?:-[2-9]))'
-    REG_POW_RAT = r'(?:(?:-?\d+)|(?:-?\d*\.\d*))\^\d+'
-    REG_POW_RAT_BRT = r'\([-+]?\d+\.?[\d+]?\)\^\d+'
-    REG_POLY_EXEC = r'(?:(?:[a-z]+)|(?:-?\d+)|(?:-?\d*\.\d*))\?'
-    REG_CLSD_FUNC = r'fun[a-z]+\(.*?\)'
-    REG_OPEN_FUNC = r'fun[a-z]+\([-+]?\d+\.?[\d+]?\)'
+    REGEX_DCT_VLS = r'(\d+\.\d+|\w+|[^ 0-9])'
+    REGEX_FLT_EXP = r'\^(?:(?:\d*\.))'
+    REGEX_NEG_EXP = r'\^(?:(?:-[2-9]))'
+    REGEX_POW_RAT = r'(?:(?:-?\d+)|(?:-?\d*\.\d*))\^\d+'
+    REGEX_POW_RAT_BRT = r'\([-+]?\d+\.?[\d+]?\)\^\d+'
+    REGEX_POLY_EXEC = r'(?:(?:[a-z]+)|(?:-?\d+)|(?:-?\d*\.\d*))\?'
+    REGEX_CLSD_FUNC = r'fun[a-z]+\(.*?\)'
+    REGEX_OPEN_FUNC = r'fun[a-z]+\([-+]?\d+\.?[\d+]?\)'
 
-    REG_MOD = r'mod\(.*?\)'
-    REG_ABS = r'abs\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
-    REG_COS = r'cos\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
-    REG_SIN = r'sin\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
-    REG_TAN = r'tan\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
-    REG_ATAN = r'atan\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
-    REG_RAD = r'rad\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REGEX_MOD = r'mod\(.*?\)'
+    REGEX_ABS = r'abs\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REGEX_SIN = r'sin\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REGEX_COS = r'cos\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REGEX_ATAN = r'atan\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REGEX_TAN = r'tan\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
+    REGEX_RAD = r'rad\([-+]?(?:(?:\d+)|(?:\d+\.\d*))\)'
 
-    REG_MATH = [REG_ABS, REG_SIN, REG_COS, REG_ATAN, REG_TAN, REG_RAD]
+    REGEX_MATH = [REGEX_ABS, REGEX_SIN, REGEX_COS,
+                  REGEX_ATAN, REGEX_TAN, REGEX_RAD]
 
     H_ERR_DICT = {
         1: 'expression should have one equal sign',
@@ -114,7 +115,7 @@ class Handler:
             if cls.key == 'i':
                 raise HandlerException(cls.H_ERR_DICT[3])
             elif 'fun' in cls.key:
-                if re.sub(Handler.REG_POLY_EXEC, '', cls.val) == '': 
+                if re.sub(Handler.REGEX_POLY_EXEC, '', cls.val) == '':
                     cls.prepare_polynomial_key_val()
                     cls.handle_polynomial(f'{cls.key}={cls.val}')
             elif re.search(r'\d', cls.key):
@@ -126,9 +127,9 @@ class Handler:
         substitution of a value from a dictionary
         for an instant calculation function
         """
-        stored_vals_list = re.findall(cls.REG_CLSD_FUNC, cls.val)
+        stored_vals_list = re.findall(cls.REGEX_CLSD_FUNC, cls.val)
         for repl in sorted(list(set(stored_vals_list)), key=len, reverse=True):
-            cleared_value = repl[repl.find('(') + 1: repl.find(')')]
+            cleared_value = repl[str(repl).find('(') + 1: str(repl).find(')')]
             is_num = False
             try:
                 float(cleared_value)
@@ -137,7 +138,7 @@ class Handler:
                 pass
             if not is_num:
                 try:
-                    new_val = repl.replace(f'({cleared_value})', f'({cls.vals[cleared_value]})')
+                    new_val = str(repl).replace(f'({cleared_value})', f'({cls.vals[cleared_value]})')
                     cls.val = cls.val.replace(repl, new_val)
                 except KeyError:
                     pass
@@ -150,7 +151,7 @@ class Handler:
         """
         formulas_list = [Utils.make_abs, Utils.make_sin, Utils.make_cos,
                          Utils.make_atan, Utils.make_tan, Utils.make_radians]
-        formulas_regs = list(zip(formulas_list, cls.REG_MATH))
+        formulas_regs = list(zip(formulas_list, cls.REGEX_MATH))
 
         for form, reg in formulas_regs:
             match_list = list(map(str, re.findall(reg, cls.val)))
@@ -160,7 +161,7 @@ class Handler:
         cls.val = Utils.clean_signs(cls.val)
 
         if 'mod' in cls.val:
-            mod_list = re.findall(cls.REG_MOD, cls.val)
+            mod_list = re.findall(cls.REGEX_MOD, cls.val)
             for repl in sorted(list(set(mod_list)), key=len, reverse=True):
                 cleared_value = repl[str(repl).find('(') + 1: str(repl).find(')')]
                 if '[' not in repl:
@@ -172,7 +173,7 @@ class Handler:
                     try:
                         det = Matrix.get_determinant(exec_cl_value.matrix_content)
                     except Exception:
-                        raise MatrixException(Matrix.M_ERR_D[8])
+                        raise MatrixException(Matrix.M_ERR_DICT[8])
                     cls.val = cls.val.replace(repl, str(Utils.try_int(det)))
 
     @classmethod
@@ -182,14 +183,14 @@ class Handler:
         substitution of funcs with parameters that are in the dictionary
         checking that all functions with parameters are substituted
         """
-        stored_closed_funcs = re.findall(cls.REG_CLSD_FUNC, cls.val)
+        stored_closed_funcs = re.findall(cls.REGEX_CLSD_FUNC, cls.val)
         for i in sorted(list(set(stored_closed_funcs)), key=len, reverse=True):
             try:
                 cls.val = cls.val.replace(i, cls.vals[i])
             except KeyError:
                 continue
 
-        stored_open_funcs = re.findall(cls.REG_OPEN_FUNC, cls.val)
+        stored_open_funcs = re.findall(cls.REGEX_OPEN_FUNC, cls.val)
         for i in sorted(list(set(stored_open_funcs)), key=len, reverse=True):
             stored_value = i[str(i).find('(') + 1: str(i).find(')')]
             look = i[:str(i).find('(') + 1]
@@ -207,10 +208,10 @@ class Handler:
                         continue
             cls.val = Utils.clean_signs(cls.val)
 
-        if re.findall(cls.REG_OPEN_FUNC, cls.val):
-            raise FunctionException(Function.F_ERR_D[6])
+        if re.findall(cls.REGEX_OPEN_FUNC, cls.val):
+            raise FunctionException(Function.F_ERR_DICT[6])
         
-        val_list = re.findall(cls.REG_DCT_VLS, cls.val)
+        val_list = re.findall(cls.REGEX_DCT_VLS, cls.val)
         for i in range(len(val_list)):
             if val_list[i].isalpha():
                 try:
@@ -224,9 +225,9 @@ class Handler:
 
     @classmethod
     def check_exponent(cls):
-        if re.findall(cls.REG_FLT_EXP, cls.res_line):
+        if re.findall(cls.REGEX_FLT_EXP, cls.res_line):
             raise HandlerException(cls.H_ERR_DICT[5])
-        elif re.findall(cls.REG_NEG_EXP, cls.res_line):
+        elif re.findall(cls.REGEX_NEG_EXP, cls.res_line):
             raise HandlerException(cls.H_ERR_DICT[6])
 
     @classmethod
@@ -235,14 +236,14 @@ class Handler:
         replacing all rational exponents without brackets
         replacing all rational exponents with brackets inside func
         """
-        rat_pow_list = re.findall(Handler.REG_POW_RAT, cls.res_line)
+        rat_pow_list = re.findall(Handler.REGEX_POW_RAT, cls.res_line)
         for i in sorted(list(set(rat_pow_list)), key=len, reverse=True):
             temp = i
             temp = eval(str(temp).replace('^', '**'))
             cls.res_line = cls.res_line.replace(i, '+' + str(temp))
         cls.res_line = Utils.clean_signs(cls.res_line)
 
-        rat_pow_brt_list = re.findall(Handler.REG_POW_RAT_BRT, cls.res_line)
+        rat_pow_brt_list = re.findall(Handler.REGEX_POW_RAT_BRT, cls.res_line)
         for i in sorted(list(set(rat_pow_brt_list)), key=len, reverse=True):
             temp = i
             temp = eval(str(temp).replace('^', '**'))
@@ -282,11 +283,11 @@ class Handler:
             cmplx_result = mod
         else:
             cmplx_result = cls.res_line
-        if re.findall(Complex.REG_WRG_INP_I, cmplx_result):
-            raise ComplexException(Complex.C_ERR_D[3])
+        if re.findall(Complex.REGEX_WRG_INP_I, cmplx_result):
+            raise ComplexException(Complex.C_ERR_DICT[3])
         cmplx_exp = Complex.process_exponents_nums(cmplx_result)
         cmplx_exp = Utils.clean_signs(cmplx_exp)
-        cmplx_vals = re.findall(Complex.REG_CMPLX_VLS, cmplx_exp)
+        cmplx_vals = re.findall(Complex.REGEX_CMPLX_VLS, cmplx_exp)
         exec_line = Complex.apply_complex_classes(cmplx_vals)
         exec_line = Utils.clean_signs(exec_line)
         if mod:
@@ -312,16 +313,16 @@ class Handler:
     @classmethod
     def handle_functions(cls, literal_vals):
         if not cls.key.startswith('fun'):
-            raise FunctionException(Function.F_ERR_D[3])
+            raise FunctionException(Function.F_ERR_DICT[3])
         elif '(' not in cls.key and ')' not in cls.key:
-            raise FunctionException(Function.F_ERR_D[4])
+            raise FunctionException(Function.F_ERR_DICT[4])
         key_var = cls.key[cls.key.find('(') + 1:cls.key.find(')')]
         if key_var != literal_vals[0]:
-            raise FunctionException(Function.F_ERR_D[5])
+            raise FunctionException(Function.F_ERR_DICT[5])
         elif key_var in cls.vals.keys():
-            raise FunctionException(Function.F_ERR_D[6])
+            raise FunctionException(Function.F_ERR_DICT[6])
         elif cls.res_line.count('(') != cls.res_line.count(')'):
-            raise FunctionException(Function.F_ERR_D[7])
+            raise FunctionException(Function.F_ERR_DICT[7])
         cls.res_line = cls.res_line.replace(literal_vals[0], 'x')
         cls.val = str(Function(Function(cls.res_line).__str__()))
         cls.val = Utils.clean_signs(cls.val.replace('x', key_var))

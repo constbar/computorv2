@@ -9,16 +9,16 @@ class ComplexException(Exception):
 
 class Complex:
     """
-    REG_WRG_INP_I - check the input sequence
-    REG_POW_CMPLX - search for all variables within an expression
-    REG_CMPLX_VLS - search for all variables inside a sign-separated expression
+    REGEX_WRG_INP_I - check the input sequence
+    REGEX_POW_CMPLX - search for all variables within an expression
+    REGEX_CMPLX_VLS - search for all variables inside a sign-separated expression
     """
 
-    REG_WRG_INP_I = r'[i]\d'
-    REG_POW_CMPLX = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[i]\^\d+'
-    REG_CMPLX_VLS = r'(-?\d+\.\d+i|-?\d+i|-?\d*\.\d*|-?\d+|[^ 0-9])'
+    REGEX_WRG_INP_I = r'[i]\d'
+    REGEX_POW_CMPLX = r'-?(?:(?:\d+)|(?:\d+\.\d+))?\*?[i]\^\d+'
+    REGEX_CMPLX_VLS = r'(-?\d+\.\d+i|-?\d+i|-?\d*\.\d*|-?\d+|[^ 0-9])'
 
-    C_ERR_D = {
+    C_ERR_DICT = {
         1: 'division by zero',
         2: 'exponent must be an integer',
         3: 'invalid syntax for complex expression'
@@ -75,7 +75,7 @@ class Complex:
             self.complex = False
             return self
         if not self.re and not other.re:
-            raise ComplexException(Complex.C_ERR_D[1])
+            raise ComplexException(Complex.C_ERR_DICT[1])
 
         conjugator = deepcopy(other)
         conjugator.im = conjugator.im * -1
@@ -83,12 +83,12 @@ class Complex:
         try:
             denominator = other * conjugator
         except ValueError:
-            raise ComplexException(Complex.C_ERR_D[1])
+            raise ComplexException(Complex.C_ERR_DICT[1])
         try:
             self.re = self.re / denominator.re
             self.im = self.im / denominator.re
         except ZeroDivisionError:
-            raise ComplexException(Complex.C_ERR_D[1])
+            raise ComplexException(Complex.C_ERR_DICT[1])
         self.complex = True if self.im else False
         return self
 
@@ -98,7 +98,7 @@ class Complex:
             self.im = 0
             return self
         elif power.complex is True:
-            raise ComplexException(Complex.C_ERR_D[2])
+            raise ComplexException(Complex.C_ERR_DICT[2])
         elif self.complex is False and power.complex is False:
             return Complex(str(self.re ** power.re))
         temp = deepcopy(self)
@@ -158,7 +158,7 @@ class Complex:
 
     @staticmethod
     def process_exponents_nums(expression):
-        result = re.sub(Complex.REG_POW_CMPLX, Complex.pow_replacer, expression)
+        result = re.sub(Complex.REGEX_POW_CMPLX, Complex.pow_replacer, expression)
         return result
 
     @staticmethod

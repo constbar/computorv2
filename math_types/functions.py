@@ -9,6 +9,7 @@ class BracketVariable:
     """
     special class for variables inside brackets in functions
     """
+    
     def __init__(self, inpt):
         self.inpt = inpt
         self.value = None
@@ -60,16 +61,16 @@ class FunctionException(Exception):
 
 class Function:
     """
-    REG_WRG_INP_L - check the input sequence
-    REG_IN_PW_PR - find all expressions in brackets
-    REG_PAR_CONT - find all variables in given expression
+    REGEX_WRG_INP_L - check the input sequence
+    REGEX_IN_PW_PR - find all expressions in brackets
+    REGEX_PAR_CONT - find all variables in given expression
     """
 
-    REG_WRG_INP_L = r'[a-z]\d'
-    REG_IN_PW_PR = r'\(.*?\)\^\d+'
-    REG_PAR_CONT = r'[-+]?(?:(?:\d+\.\d*[a-z]?)|(?:\d+?[a-z]+)|(?:\d+)|(?:[a-z]))'
+    REGEX_WRG_INP_L = r'[a-z]\d'
+    REGEX_IN_PW_PR = r'\(.*?\)\^\d+'
+    REGEX_PAR_CONT = r'[-+]?(?:(?:\d+\.\d*[a-z]?)|(?:\d+?[a-z]+)|(?:\d+)|(?:[a-z]))'
 
-    F_ERR_D = {
+    F_ERR_DICT = {
         1: 'invalid syntax for function expression',
         2: 'the program does not process nested brackets in functions',
         3: 'the first part must contain the keyword \'fun\'',
@@ -80,8 +81,8 @@ class Function:
     }
 
     def __init__(self, inpt):
-        if len(re.findall(Function.REG_WRG_INP_L, inpt)):
-            raise FunctionException(Function.F_ERR_D[1])
+        if len(re.findall(Function.REGEX_WRG_INP_L, inpt)):
+            raise FunctionException(Function.F_ERR_DICT[1])
         self.func_content = self.substitute_parentheses(inpt)
 
     @staticmethod
@@ -91,11 +92,11 @@ class Function:
         also correctly open parentheses if the minus sign precedes the parentheses
         """
         repl_par = function
-        par_power_list = list(set(re.findall(Function.REG_IN_PW_PR, function)))
+        par_power_list = list(set(re.findall(Function.REGEX_IN_PW_PR, function)))
         if len(par_power_list):
             for i in sorted(par_power_list, key=len, reverse=True):
                 if '(' in i[1:]:
-                    raise FunctionException(Function.F_ERR_D[2])
+                    raise FunctionException(Function.F_ERR_DICT[2])
                 temp = Function.open_parentheses(str(i)).strip('()')
                 temp = Function.apply_reduced_form(temp)
                 repl_par = repl_par.replace(i, f'({temp})')
@@ -125,7 +126,7 @@ class Function:
     @staticmethod
     def open_parentheses(expression):
         value, power = expression.split('^')
-        literal_vals = re.findall(Function.REG_PAR_CONT, value)
+        literal_vals = re.findall(Function.REGEX_PAR_CONT, value)
         fin = deepcopy(literal_vals)
         for i in range(int(power) - 1):
             prod = list(product(fin, literal_vals))

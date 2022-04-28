@@ -9,7 +9,7 @@ class BracketVariable:
     """
     special class for variables inside brackets in functions
     """
-    
+
     def __init__(self, inpt):
         self.inpt = inpt
         self.value = None

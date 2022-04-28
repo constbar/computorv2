@@ -21,7 +21,7 @@ class Polynomial:
 
     P_ERR_DICT = {
         1: 'wrong syntax on the left side of the polynomial expression',
-        2: 'wrong syntax on the right side of the polynomial expression', 
+        2: 'wrong syntax on the right side of the polynomial expression',
         3: 'polynomial expression must have an integer exponent',
         4: 'polynomial expression must have a non-negative exponent',
         5: 'polynomial expression can only have allowed syntax',
@@ -155,7 +155,7 @@ class PolyCalc:
 
         red_form = ''
         for i in self.data.keys():
-            if self.data[i]:                    
+            if self.data[i]:
                 if i == 0:
                     if self.data[i] == 1:
                         red_form += f'1+'
@@ -197,7 +197,7 @@ class PolyCalc:
             print('there are two solutions:')
         else:
             print('the solution is:')
-        
+
         if self.pol_dgr == 2 and self.disc < 0:
             for i in self.results:
                 print(i)

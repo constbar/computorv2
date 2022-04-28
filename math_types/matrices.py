@@ -202,7 +202,7 @@ class Matrix:
         elif rows_len == 2:
             return matrix_list[0][0] * matrix_list[1][1] \
                 - matrix_list[0][1] * matrix_list[1][0]
-        
+
         determinant = 0
         for col in range(cols_len):
             minor_det = Matrix.get_determinant(

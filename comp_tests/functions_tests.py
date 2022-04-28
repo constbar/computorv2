@@ -29,7 +29,7 @@ test_2 = [
     'func(x) = (4 + 10x + 101x + 25x^2) / (16 + 8x^1 + 8x^1 + 4x^2) + 20x + 22 + 21 % 200']
 
 test_3 = [
-    'c = funca(x) + funcb(x)', 'c = funca(x) + funcb(x) + funcc(x) + funcd(x)', 
+    'c = funca(x) + funcb(x)', 'c = funca(x) + funcb(x) + funcc(x) + funcd(x)',
     'funca(x) = 2x + 12', 'funcb(x) = x + 2', 'funcc(x) = x', 'funcd(x) = 2 + 1', 'f(x)=x',
     'funcd(x) = funca(x) + funca(x)', 'c = funca(x) * funca(x)', 'c = funca(x) * funca(x)',
     'c = funca(12) + funcb(2)', 'c = funca(3) + funcb(4) + funcc(5) + funcd(6) + funcd(7)']

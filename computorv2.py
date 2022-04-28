@@ -15,7 +15,7 @@ class Comp(Cmd):
     def do_exit(self, _):
         print('program closure')
         return True
-    
+
     def help_exit(self):
         print('exit from the program. ctrl-d or \'exit\'')
 

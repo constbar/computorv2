@@ -50,7 +50,7 @@ class Handler:
         5: 'expression must have an integer exponent',
         6: 'expression must have a non-negative exponent',
         7: 'too many unknown vars for expression',
-        8: 'variable should have allowed syntax'
+        8: 'expression should have allowed syntax'
     }
 
     hist = list()
@@ -210,7 +210,7 @@ class Handler:
 
         if re.findall(cls.REGEX_OPEN_FUNC, cls.val):
             raise FunctionException(Function.F_ERR_DICT[6])
-        
+
         val_list = re.findall(cls.REGEX_DCT_VLS, cls.val)
         for i in range(len(val_list)):
             if val_list[i].isalpha():
@@ -252,7 +252,7 @@ class Handler:
 
     @classmethod
     def handle_expression(cls):
-        is_complex = False 
+        is_complex = False
         literal_vals = list(set(re.findall(r'[a-zA-Z]+', cls.res_line)))
         try:
             literal_vals.remove('i')

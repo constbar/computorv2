@@ -164,7 +164,7 @@ class Complex:
     @staticmethod
     def apply_complex_classes(values_list):
         exec_line = ''.join(f"Complex('{i}')" if i not in '-+*/^()' else i for i in values_list)
-        exec_line = Utils.clean_signs(exec_line)        
+        exec_line = Utils.clean_signs(exec_line)
         if exec_line[0] == '-':
             exec_line = "Complex('-1')*" + exec_line[1:]
         elif exec_line[0] == '+':

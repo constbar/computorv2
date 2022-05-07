@@ -11,6 +11,8 @@ python3 computorv2.py
 
 additional options in interpreter:
 
+`=?` for instant calculation
+
 `*` and `**` for matrix multiplication. by term-to-term and matrices, respectively
 
 `mod` to calculate the determinant in a matrix, to calculate the modulus of a complex number

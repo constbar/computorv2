@@ -33,8 +33,8 @@ python3 comp_tests/run_test_execution.py
 python3 comp_tests/send_test_execution.py
 ```
 
-![](tests.gif)
-
 the first program creates a socket on which it waits for expressions and executes when received
 
 the second program sends a random expression for execution from prepared tests
+
+![](tests.gif)

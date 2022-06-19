@@ -183,7 +183,7 @@ class PolyCalc:
         if max_len_of_input > self.prec:
             self.prec = max_len_of_input
 
-        if self.check_high_poly:
+        if self.check_high_poly():
             raise PolynomialException(
                 'the polynomial degree is strictly greater than 2. could not be solved')
         elif self.pol_dgr == 0:

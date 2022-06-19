@@ -37,7 +37,7 @@ class Matrix:
             raise MatrixException(Matrix.M_ERR_DICT[1])
 
         self.raw_inp = inpt[1:-1].split(';')
-        self.matrix_content = self.cleaned_input
+        self.matrix_content = self.clean_input()
 
         if not self.check_uniformity():
             raise MatrixException(Matrix.M_ERR_DICT[2])
@@ -46,8 +46,7 @@ class Matrix:
         self.rows = len(self.matrix_content)
         self.cols = len(self.matrix_content[0])
 
-    @property
-    def cleaned_input(self):
+    def clean_input(self):
         try:
             return [list(map(float, i.strip('[]').split(','))) for i in self.raw_inp]
         except ValueError:

@@ -30,21 +30,19 @@ class Polynomial:
 
     def __init__(self, equation, print_answer=False):
         self.orig = equation
-        self.cin = self.cut_input
-        self.clean_data = self.sort_variables
+        self.cin = self.cut_input()
+        self.clean_data = self.sort_variables()
         self.check_errors()
         self.eq = PolyCalc(self.clean_data, print_answer)
 
     def get_clean_data(self):
         return self.clean_data
 
-    @property
     def cut_input(self):
         cut_inp = self.orig
         cut_inp = cut_inp.replace('\t', '').replace(' ', '')
         return cut_inp
 
-    @property
     def sort_variables(self):
         left_part, right_part = self.cin.split('=')
         left_dict = dict()
@@ -117,16 +115,15 @@ class PolyCalc:
         self.prec = 4
         self.disc = None
         self.results = list()
-        self.i_data = self.try_int_data
-        self.pol_dgr = self.get_poly_degree
+        self.i_data = self.try_int_data()
+        self.pol_dgr = self.get_poly_degree()
         if print_answer:
             if len(self.data) > 3:
-                if self.check_high_poly:
+                if self.check_high_poly():
                     self.print_final_result()
             self.make_calculations()
             self.print_final_result()
 
-    @property
     def check_high_poly(self):
         h_vals = list(filter(lambda i: i > 2, self.data.keys()))
         for v in h_vals:
@@ -134,11 +131,9 @@ class PolyCalc:
                 return True
         return False
 
-    @property
     def try_int_data(self):
         return {k: Utils.try_int(v) for k, v in self.data.items()}
 
-    @property
     def get_poly_degree(self):
         degree = 0
         for k, v in self.data.items():

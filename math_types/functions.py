@@ -21,15 +21,13 @@ class BracketVariable:
             self.factor = float(inpt)
             self.power = 0
         else:
-            self.value = self.clean_input
-            self.factor = self.get_factor
-            self.power = self.get_power
+            self.value = self.clean_input()
+            self.factor = self.get_factor()
+            self.power = self.get_power()
 
-    @property
     def clean_input(self):
         return self.inpt.replace('*', '')
 
-    @property
     def get_factor(self):
         if self.value.startswith('-x'):
             return -1
@@ -40,7 +38,6 @@ class BracketVariable:
         else:
             return 1
 
-    @property
     def get_power(self):
         if '^' not in self.value:
             return 1

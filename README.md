@@ -1,6 +1,6 @@
 ## computorv2
 
-project of École 42 where it is necessary to implement an interpreter very similar to the bc command. the program supports basic math operations for `rational numbers`, `complex numbers`, `matrices`, `polynomial equations` and `functions`.
+project of École 42 where it is necessary to implement an interpreter very similar to the bc command without using libraries that make it easier to work with complex numbers and matrices. the program supports basic math operations for `rational numbers`, `complex numbers`, `matrices`, `polynomial equations` and `functions`.
 
 ![](comp2.gif)
 

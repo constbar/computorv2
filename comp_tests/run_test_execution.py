@@ -2,8 +2,9 @@
 
 import os
 import sys
-import zmq
 import time
+
+import zmq
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 

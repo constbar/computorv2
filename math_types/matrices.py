@@ -1,5 +1,6 @@
 import re
 from copy import deepcopy
+
 from math_types.utils import Utils
 
 
@@ -41,7 +42,7 @@ class Matrix:
         if not self.check_uniformity():
             raise MatrixException(Matrix.M_ERR_DICT[2])
 
-        self.inversed = False
+        self.inverted = False
         self.rows = len(self.matrix_content)
         self.cols = len(self.matrix_content[0])
 
@@ -116,9 +117,9 @@ class Matrix:
                     ret_matrix[self_row][rot_row] = sum(res_cell)
             self.matrix_content = ret_matrix
 
-            if self.inversed or other.inversed:
+            if self.inverted or other.inverted:
                 self.matrix_content = self.round_matrix_elements(self.matrix_content, 0)
-                self.inversed = False
+                self.inverted = False
             self.recalculate_matrix()
             return self
 
@@ -205,8 +206,7 @@ class Matrix:
 
         determinant = 0
         for col in range(cols_len):
-            minor_det = Matrix.get_determinant(
-                Matrix.get_minor(matrix_list, 0, col))
+            minor_det = Matrix.get_determinant(Matrix.get_minor(matrix_list, 0, col))
             determinant += (-1)**col * matrix_list[0][col] * minor_det
         return determinant
 
@@ -237,7 +237,7 @@ class Matrix:
             matrix_class.matrix_content = cofactors
 
         matrix_class.matrix_content = Matrix.round_matrix_elements(matrix_class.matrix_content)
-        matrix_class.inversed = True
+        matrix_class.inverted = True
         matrix_class.recalculate_matrix()
         return matrix_class
 

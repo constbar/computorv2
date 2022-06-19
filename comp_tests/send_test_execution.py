@@ -1,13 +1,15 @@
 #!/usr/bin/python3
 
 import sys
-import zmq
-import matrices_tests
-import functions_tests
-import complex_nums_tests
 from random import randint
-import rationals_syntax_tests
+
+import zmq
 from termcolor import colored
+
+import complex_nums_tests
+import functions_tests
+import matrices_tests
+import rationals_syntax_tests
 
 
 def help_func():

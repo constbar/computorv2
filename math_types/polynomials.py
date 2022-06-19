@@ -1,6 +1,7 @@
 import re
-from math_types.utils import Utils
+
 from math_types.complex_nums import Complex
+from math_types.utils import Utils
 
 
 class PolynomialException(Exception):

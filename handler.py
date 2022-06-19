@@ -1,9 +1,10 @@
 import re
-from math_types.utils import Utils
-from math_types.matrices import Matrix, MatrixException
-from math_types.functions import Function, FunctionException
+
 from math_types.complex_nums import Complex, ComplexException
+from math_types.functions import Function, FunctionException
+from math_types.matrices import Matrix, MatrixException
 from math_types.polynomials import Polynomial, PolynomialException
+from math_types.utils import Utils
 
 
 class HandlerException(Exception):
@@ -93,7 +94,7 @@ class Handler:
         if cls.pre_line in cls.vals.keys():
             if '[[' in cls.vals[cls.pre_line]:
                 print(cls.vals[cls.pre_line].replace('[[', '[').
-                    replace(']]', ']').replace(';', '\n'))
+                      replace(']]', ']').replace(';', '\n'))
             else:
                 print(cls.vals[cls.pre_line])
             raise

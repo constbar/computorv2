@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 
 from cmd import Cmd
+
 from termcolor import colored
+
 from handler import Handler, HandlerException
-from math_types.matrices import MatrixException
-from math_types.functions import FunctionException
 from math_types.complex_nums import ComplexException
+from math_types.functions import FunctionException
+from math_types.matrices import MatrixException
 from math_types.polynomials import PolynomialException
 
 
@@ -42,7 +44,7 @@ class Comp(Cmd):
     def do_reset(self, _):
         Handler.hist = list()
         Handler.vals = dict()
-        print('command history and saved variables cleared')
+        print(colored('command history and saved variables cleared', 'cyan'))
 
     def help_reset(self):
         print('clear command history and saved variables')

@@ -1,8 +1,9 @@
 import re
 from copy import deepcopy
 from itertools import product
-from math_types.utils import Utils
+
 from math_types.polynomials import Polynomial, PolyCalc
+from math_types.utils import Utils
 
 
 class BracketVariable:
